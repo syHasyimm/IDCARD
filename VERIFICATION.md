@@ -1,7 +1,7 @@
 **Verifikasi implementasi — 13 Oktober 2026**
 
 - Build TypeScript dan Vite berhasil.
-- Delapan tes terhadap build produksi terbaru berhasil: empat skenario pada Chrome desktop dan empat pada Chrome dengan viewport ponsel Pixel 7.
+- Versi dengan dua tab sebelumnya lolos delapan tes: empat skenario pada Chrome desktop dan empat pada Chrome dengan viewport ponsel Pixel 7. Perubahan warna label Peserta terbaru lolos dua tes yang difokuskan pada kartu Peserta, masing-masing desktop dan ponsel.
 - Dimensi unduhan PNG diperiksa langsung dari header file: 1240 × 1748 px.
 - Metadata PNG memiliki satu pHYs chunk 300 DPI yang valid, termasuk CRC.
 - Area foto memiliki rasio 2:3 dan ukuran fisik 4 × 6 cm pada acuan cetak tersebut.
@@ -12,6 +12,7 @@
 - Navigasi tab dengan keyboard berfungsi; Jabatan dan Pangkalan tetap terpisah saat tab diganti.
 - Nama/foto tetap tersedia saat tab diganti, dan Reset membersihkan data sambil mempertahankan pilihan tab.
 - PNG peserta mempertahankan desain merah asli, dimensi kartu, dan metadata 300 DPI.
+- Label Nama Peserta menggunakan merah tua #B91C1C; label Pangkalan menggunakan #991B1B, dengan teks putih. Preview dan PNG diperiksa secara visual setelah perubahan. Warna label Panitia tetap mengikuti template cokelatnya.
 - Pixel PNG yang diunduh sama dengan pixel preview pada skenario uji.
 - Zoom dan posisi crop dengan keyboard mengubah preview sebelum tombol panah dilepas.
 - Nama/jabatan yang tidak muat serta input kosong menonaktifkan unduhan.

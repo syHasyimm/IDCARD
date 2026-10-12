@@ -10,8 +10,8 @@ export const PHOTO_AREA = { x: 810 - photoWidth / 2, y: 600, width: photoWidth, 
 
 export type CardKind = 'panitia' | 'peserta';
 export const CARD_VARIANTS = {
-  panitia: { label: 'Panitia', detailLabel: 'Jabatan', detailPlaceholder: 'Jabatan Anda', asset: 'template-background.png' },
-  peserta: { label: 'Peserta', detailLabel: 'Pangkalan', detailPlaceholder: 'Pangkalan Anda', asset: 'template-peserta.png' },
+  panitia: { label: 'Panitia', detailLabel: 'Jabatan', detailPlaceholder: 'Jabatan Anda', asset: 'template-background.png', nameplateColors: { name: '#31242d', detail: '#48333f' } },
+  peserta: { label: 'Peserta', detailLabel: 'Pangkalan', detailPlaceholder: 'Pangkalan Anda', asset: 'template-peserta.png', nameplateColors: { name: '#b91c1c', detail: '#991b1b' } },
 } as const;
 
 export type CropArea = { x: number; y: number; width: number; height: number };
@@ -115,13 +115,14 @@ function drawLabel(
   return fitted.fits;
 }
 
-function drawNameplates(context: CanvasRenderingContext2D): void {
+function drawNameplates(context: CanvasRenderingContext2D, kind: CardKind): void {
+  const colors = CARD_VARIANTS[kind].nameplateColors;
   context.save();
-  context.fillStyle = '#31242d';
+  context.fillStyle = colors.name;
   context.beginPath();
   context.roundRect(440, 1460, 740, 120, 24);
   context.fill();
-  context.fillStyle = '#48333f';
+  context.fillStyle = colors.detail;
   context.beginPath();
   context.roundRect(440, 1610, 740, 94, 18);
   context.fill();
@@ -171,7 +172,7 @@ export function renderCard(
     context.restore();
   }
 
-  drawNameplates(context);
+  drawNameplates(context, data.kind);
 
   return {
     nameFits: drawLabel(context, data.name, 'Nama Anda', TEMPLATE_CONFIG.name),
