@@ -1,0 +1,12 @@
+node_modules/
+.npm-cache/
+dist/
+test-results/
+playwright-report/
+artifacts/
+output/
+*.tsbuildinfo
+.env
+.env.*
+.openai/*.tar.gz
+.openai/deploy*.json

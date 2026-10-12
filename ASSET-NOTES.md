@@ -1,0 +1,27 @@
+# Template asset notes
+
+- Source supplied by the user: `C:\Users\hasyi\Downloads\Biru  Dan Putih Modern ID Card KKN Card.png`.
+- Source card dimensions: 1240 × 1748 pixels (portrait).
+- Project asset: `public/assets/template-clean.png`.
+- Final generated asset dimensions: 1056 × 1489 pixels (portrait).
+- Method: built-in image_gen edit using the original PNG as referenced_image_paths, with an opaque background; copied the selected output into the workspace without overwriting the user's original.
+- Edit classification: precise-object-edit.
+- Cleanup: removed the example woman, all books and hands, and the words "Nama" and "Jabatan". The top event logo, vertical PANITIA title, torn panel concept, faint watermark, and two dark blank text bars remain.
+- Expected application coordinate system: 1240 × 1748. Draw this background to that size in Canvas. The generated image has practically the same aspect ratio; the difference is less than one pixel at the original dimensions.
+- Visual review: subject and placeholder removal succeeded. The bars remain at the same relative positions and are blank.
+- Limitation: this is a generated reconstruction, not the editable original design. The previously hidden watermark was reconstructed, and subtle details of the watermark, torn edges, lettering, flat colors, and shading may differ from the original. Replace this asset with a genuine blank export from the original editor for exact fidelity if one becomes available. The source file was preserved.
+- No Python or deterministic raster editing was used; System.Drawing was used only to read dimensions.
+
+## Final edit prompt
+
+```text
+Use case: precise-object-edit.
+Asset type: fixed empty printable ID card PNG template for browser generation.
+Input image 1 is the EDIT TARGET, not merely a stylistic reference.
+Primary request: Remove ONLY the woman (entire head, hair, glasses, body, denim clothing, arms, hands) and ALL books she holds. Also remove ONLY the white placeholder words "Nama" and "Jabatan" from the two dark bottom rounded bars. This is a surgical object-removal cleanup of the existing card, NOT a redesigned card.
+Reconstruct the currently occluded background behind the removed woman/books naturally using the existing white field and the large faint low-opacity emblem watermark. No new objects or subjects.
+KEEP EXACTLY the original card composition, colors, left brown torn-paper panel, black/dark wavy torn-paper divider, white right background, large vertical white "PANITIA" text with its existing shadow on the left, and the original colorful top event logo with its wording and type layout unchanged. Exact top wording: "KEMAH BESAR", "PENGGALANG", "TITIAN KURANJI", "ULAK PATIAN". Do not alter the top logo or left text in any way.
+KEEP BOTH existing dark rounded bottom label bars intact, solid uniform dark aubergine, completely blank inside (no text): at the input 1240 x 1748 pixel coordinate scale the first bar is x405, y1470, width720, height112; second bar is x224, y1623, width792, height88. Preserve their positions, proportions, corners, and color precisely.
+Preserve the large faded watermark emblem behind the photo area; recover only portions that were obscured. Retain all existing areas outside the removed woman/books and the two placeholder text words pixel-faithfully. Use the same portrait 1240 x 1748 composition, edge positions, proportions, and full-frame crop. No border, no padding, no additional text. Opaque background.
+```
+
