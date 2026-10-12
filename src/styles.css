@@ -64,6 +64,11 @@ h1, h2, p { margin: 0; }
 .eyebrow { font-size: 10px; font-weight: 600; letter-spacing: 1.8px; color: #816b63; margin-bottom: 13px; }
 h1 { font-size: clamp(35px, 4.1vw, 47px); letter-spacing: -2.3px; line-height: 1.15; font-weight: 600; }
 .intro-copy { color: var(--muted); font-size: 13px; line-height: 1.9; margin-top: 17px; }
+.variant-tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; padding: 4px; margin: 0 0 22px; max-width: 268px; background: #eae4de; border: 1px solid #ded3c9; border-radius: 8px; }
+.variant-tabs button { min-height: 40px; border: 1px solid transparent; border-radius: 5px; background: transparent; color: #7c6860; font-size: 12px; font-weight: 500; }
+.variant-tabs button:hover:not(:disabled) { color: #4a342a; background: #f1ebe6; }
+.variant-tabs button[aria-selected='true'] { background: #fff; border-color: #ddd1c8; color: var(--ink); font-weight: 600; }
+.variant-tabs button:focus-visible { position: relative; z-index: 1; }
 .form-section { border-top: 1px solid var(--line); padding-top: 18px; }
 .section-heading { display: flex; justify-content: space-between; align-items: center; gap: 14px; margin-bottom: 20px; }
 .section-heading h2 { display: flex; align-items: center; gap: 11px; font-size: 14px; font-weight: 600; letter-spacing: -.3px; }
@@ -115,6 +120,8 @@ h1 { font-size: clamp(35px, 4.1vw, 47px); letter-spacing: -2.3px; line-height: 1
 .preview-column { padding-top: 1px; }
 .preview-heading { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 17px; min-height: 25px; }
 .preview-heading h2 { font-size: 13px; font-weight: 500; letter-spacing: -.2px; }
+.preview-title-group { display: flex; align-items: center; gap: 9px; min-width: 0; }
+.preview-kind { color: #7c665a; background: #e9dfd6; border: 1px solid #d7c7b9; padding: 2px 6px; border-radius: 4px; font-size: 9px; line-height: 1.6; }
 .status-badge { display: flex; align-items: center; gap: 5px; font-size: 10px; color: #7c6b65; background: #ece6e0; padding: 5px 8px; border-radius: 5px; }
 .status-badge > span { width: 4px; height: 4px; border-radius: 50%; background: #ac9587; }
 .status-badge.is-ready { color: #805343; background: #ebdcd4; }
@@ -170,6 +177,8 @@ h1 { font-size: clamp(35px, 4.1vw, 47px); letter-spacing: -2.3px; line-height: 1
   .eyebrow { font-size: 9px; margin-bottom: 12px; }
   h1 { font-size: 39px; letter-spacing: -1.8px; }
   .intro-copy { margin-top: 14px; font-size: 12px; }
+  .variant-tabs { max-width: none; margin-bottom: 24px; }
+  .variant-tabs button { min-height: 44px; font-size: 13px; }
   .field input { font-size: 16px; height: 49px; }
   .field label { font-size: 12px; }
   .section-heading h2 { font-size: 14px; }
@@ -180,6 +189,7 @@ h1 { font-size: clamp(35px, 4.1vw, 47px); letter-spacing: -2.3px; line-height: 1
   .editor-footer p { max-width: none; font-size: 9px; }
   .reset-button { font-size: 11px; }
   .preview-heading h2 { font-size: 13px; }
+  .preview-title-group { gap: 6px; }
   .status-badge { font-size: 10px; }
   .preview-stage { padding: 20px; }
   .export-spec { font-size: 10px; }

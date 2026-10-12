@@ -1,6 +1,8 @@
 **Rencana aplikasi generator ID card**
 
-Keputusan pengguna: aplikasi frontend saja, satu template tetap dari pengguna, input Nama/Jabatan dengan Foto opsional, dan unduhan PNG saja. Nama serta Jabatan ditampilkan UPPERCASE. Hanya area foto berukuran 4 × 6 cm dengan acuan 300 DPI; ukuran kartu tetap 1240 × 1748 px. Implementasi telah dibuat; panduan penggunaan ada di README.md.
+Keputusan pengguna terbaru: aplikasi frontend saja dengan tab Panitia dan Peserta. Panitia membutuhkan Nama dan Jabatan; Peserta membutuhkan Nama dan Pangkalan. Foto opsional dan unduhan PNG untuk keduanya. Seluruh teks ditampilkan UPPERCASE. Foto dan kedua label menggunakan posisi yang sama pada kedua template. Hanya area foto berukuran 4 × 6 cm dengan acuan 300 DPI; ukuran kartu tetap 1240 × 1748 px. Implementasi telah dibuat; panduan penggunaan ada di README.md.
+
+Nama/foto dipertahankan saat tab diganti, sementara Jabatan dan Pangkalan disimpan terpisah. Reset membersihkan kedua set data dan foto. Template peserta menggunakan salinan persis file yang disediakan pengguna. Rencana versi pertama di bawah mencatat cakupan awal, dengan perluasan dua tab tersebut sebagai keputusan terbaru.
 
 Template yang diberikan berukuran 1240 × 1748 px dan sudah berisi foto contoh. Aset kosong dibuat melalui imagegen dengan menghapus foto dan placeholder. Bagian watermark yang sebelumnya tertutup direkonstruksi; lihat ASSET-NOTES.md. Hasil PNG tetap berukuran 1240 × 1748 px. Foto JPG/PNG biasa mempertahankan latarnya; gunakan PNG transparan untuk tampilan seperti potongan orang pada contoh asli.
 

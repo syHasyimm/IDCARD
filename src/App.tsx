@@ -1,9 +1,10 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
-import type { DragEvent, FormEvent } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import type { DragEvent, FormEvent, KeyboardEvent } from 'react'
 import Cropper from 'react-easy-crop'
 import {
   CARD_HEIGHT,
   CARD_WIDTH,
+  CARD_VARIANTS,
   PHOTO_AREA,
   PHOTO_SIZE_CM,
   PRINT_DPI,
@@ -13,14 +14,16 @@ import {
   makeFilename,
   renderCard,
 } from './lib/card'
-import type { CropArea } from './lib/card'
+import type { CardData, CardKind, CropArea } from './lib/card'
 import { loadPhoto } from './lib/photo'
 import './styles.css'
 
 type Photo = { image: HTMLImageElement; url: string; filename: string }
-type Fits = { nameFits: boolean; positionFits: boolean }
+type Fits = { nameFits: boolean; detailFits: boolean }
+type LoadedTemplate = { kind: CardKind; image: HTMLImageElement }
 
-const EMPTY_FITS: Fits = { nameFits: true, positionFits: true }
+const EMPTY_FITS: Fits = { nameFits: true, detailFits: true }
+const CARD_KINDS: CardKind[] = ['panitia', 'peserta']
 
 function errorMessage(error: unknown, fallback: string) {
   return error instanceof Error ? error.message : fallback
@@ -32,9 +35,11 @@ function sameArea(first: CropArea | null, second: CropArea) {
 }
 
 export default function App() {
+  const [kind, setKind] = useState<CardKind>('panitia')
   const [name, setName] = useState('')
   const [position, setPosition] = useState('')
-  const [template, setTemplate] = useState<HTMLImageElement | null>(null)
+  const [pangkalan, setPangkalan] = useState('')
+  const [template, setTemplate] = useState<LoadedTemplate | null>(null)
   const [templateError, setTemplateError] = useState<string | null>(null)
   const [photo, setPhoto] = useState<Photo | null>(null)
   const [crop, setCrop] = useState<CropArea | null>(null)
@@ -55,18 +60,29 @@ export default function App() {
   const uploadTokenRef = useRef(0)
   const dragDepthRef = useRef(0)
   const exportLockRef = useRef(false)
+  const tabRefs = useRef<Record<CardKind, HTMLButtonElement | null>>({ panitia: null, peserta: null })
+  const variant = CARD_VARIANTS[kind]
+  const detailValue = kind === 'panitia' ? position : pangkalan
+  const detailInputId = kind === 'panitia' ? 'card-position' : 'card-pangkalan'
+  const templateMatchesKind = template?.kind === kind
+  const cardData = useMemo<CardData>(() => {
+    const shared = { name, photo: photo?.image ?? null, crop }
+    return kind === 'panitia' ? { ...shared, kind, position } : { ...shared, kind, pangkalan }
+  }, [kind, name, position, pangkalan, photo, crop])
 
   useEffect(() => {
     let cancelled = false
-    Promise.all([loadTemplate(), document.fonts.ready])
+    setTemplate(null)
+    setTemplateError(null)
+    Promise.all([loadTemplate(kind), document.fonts.ready])
       .then(([image]) => {
-        if (!cancelled) setTemplate(image)
+        if (!cancelled) setTemplate({ kind, image })
       })
       .catch((error: unknown) => {
         if (!cancelled) setTemplateError(errorMessage(error, 'Template gagal dimuat. Muat ulang halaman untuk mencoba lagi.'))
       })
     return () => { cancelled = true }
-  }, [])
+  }, [kind])
 
   useEffect(() => () => {
     uploadTokenRef.current += 1
@@ -74,14 +90,14 @@ export default function App() {
   }, [])
 
   useEffect(() => {
-    if (!template || !canvasRef.current) return
+    if (!template || template.kind !== kind || !canvasRef.current) return
     let cancelled = false
     setPreviewUpdating(true)
     document.fonts.ready.then(() => {
       if (cancelled || !canvasRef.current) return
       try {
-        const nextFits = renderCard(canvasRef.current, template, { name, position, photo: photo?.image ?? null, crop })
-        setFits((previous) => previous.nameFits === nextFits.nameFits && previous.positionFits === nextFits.positionFits ? previous : nextFits)
+        const nextFits = renderCard(canvasRef.current, template.image, cardData)
+        setFits((previous) => previous.nameFits === nextFits.nameFits && previous.detailFits === nextFits.detailFits ? previous : nextFits)
         setRenderError(null)
       } catch (error: unknown) {
         setRenderError(errorMessage(error, 'Preview belum dapat dibuat. Coba ganti foto atau muat ulang halaman.'))
@@ -95,16 +111,45 @@ export default function App() {
       }
     })
     return () => { cancelled = true }
-  }, [template, name, position, photo, crop])
+  }, [template, kind, cardData])
 
-  const completedFields = Number(Boolean(name.trim())) + Number(Boolean(position.trim()))
-  const ready = Boolean(template && name.trim() && position.trim() && (!photo || crop)
-    && fits.nameFits && fits.positionFits && !templateError && !renderError
+  const completedFields = Number(Boolean(name.trim())) + Number(Boolean(detailValue.trim()))
+  const ready = Boolean(templateMatchesKind && name.trim() && detailValue.trim() && (!photo || crop)
+    && fits.nameFits && fits.detailFits && !templateError && !renderError
     && !uploading && !exporting && !previewUpdating)
 
   const clearDownloadMessage = () => {
     setDownloadError(null)
     setDownloadStatus(null)
+  }
+
+  function switchKind(nextKind: CardKind) {
+    if (nextKind === kind || exporting || uploading || exportLockRef.current) return
+    setTemplate(null)
+    setKind(nextKind)
+    setFits(EMPTY_FITS)
+    setTemplateError(null)
+    setRenderError(null)
+    setPhotoError(null)
+    setPreviewUpdating(false)
+    clearDownloadMessage()
+  }
+
+  function onTabKeyDown(event: KeyboardEvent<HTMLButtonElement>) {
+    if (exporting || uploading) return
+    let nextKind: CardKind
+    if (event.key === 'ArrowRight' || event.key === 'ArrowLeft') {
+      nextKind = kind === 'panitia' ? 'peserta' : 'panitia'
+    } else if (event.key === 'Home') {
+      nextKind = 'panitia'
+    } else if (event.key === 'End') {
+      nextKind = 'peserta'
+    } else {
+      return
+    }
+    event.preventDefault()
+    switchKind(nextKind)
+    tabRefs.current[nextKind]?.focus()
   }
 
   async function selectPhoto(file: File) {
@@ -152,6 +197,7 @@ export default function App() {
     removePhoto()
     setName('')
     setPosition('')
+    setPangkalan('')
     setFits(EMPTY_FITS)
     setDragging(false)
     dragDepthRef.current = 0
@@ -192,14 +238,14 @@ export default function App() {
 
   async function handleDownload(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
-    if (!ready || !template || exportLockRef.current) return
+    if (!ready || !template || template.kind !== kind || exportLockRef.current) return
     exportLockRef.current = true
     setExporting(true)
     clearDownloadMessage()
     try {
       await document.fonts.ready
-      const blob = await exportPng(template, { name: name.trim(), position: position.trim(), photo: photo?.image ?? null, crop })
-      downloadBlob(blob, makeFilename(name))
+      const blob = await exportPng(template.image, cardData)
+      downloadBlob(blob, makeFilename(name, kind))
       setDownloadStatus('PNG siap. Periksa folder unduhan Anda.')
     } catch (error: unknown) {
       setDownloadError(errorMessage(error, 'PNG gagal dibuat. Coba unduh kembali.'))
@@ -210,7 +256,7 @@ export default function App() {
   }
 
   const statusLabel = templateError || renderError ? 'Perlu diperiksa'
-    : !template ? 'Memuat template'
+    : !templateMatchesKind ? 'Memuat template'
       : uploading ? 'Memuat foto'
         : exporting ? 'Menyiapkan PNG'
           : ready ? 'Siap diunduh' : 'Sedang disusun'
@@ -230,10 +276,21 @@ export default function App() {
           <div className="intro">
             <p className="eyebrow">ID CARD GENERATOR</p>
             <h1 id="page-title">Buat ID card.</h1>
-            <p className="intro-copy">Isi nama dan jabatan. Tambahkan foto jika perlu,<br className="desktop-break" /> lalu unduh kartu Anda.</p>
+            <p className="intro-copy">Isi nama dan {variant.detailLabel.toLowerCase()}. Tambahkan foto jika perlu,<br className="desktop-break" /> lalu unduh kartu Anda.</p>
           </div>
 
-          <form id="card-form" onSubmit={handleDownload} noValidate>
+          <div className="variant-tabs" role="tablist" aria-label="Jenis kartu">
+            {CARD_KINDS.map((tabKind) => (
+              <button key={tabKind} ref={(element) => { tabRefs.current[tabKind] = element }} id={`card-tab-${tabKind}`}
+                type="button" role="tab" aria-selected={kind === tabKind} aria-controls="card-form"
+                tabIndex={kind === tabKind ? 0 : -1} disabled={exporting || uploading}
+                onClick={() => switchKind(tabKind)} onKeyDown={onTabKeyDown}>
+                {CARD_VARIANTS[tabKind].label}
+              </button>
+            ))}
+          </div>
+
+          <form id="card-form" role="tabpanel" aria-labelledby={`card-tab-${kind}`} onSubmit={handleDownload} noValidate>
             <section className="form-section" aria-labelledby="details-title">
               <div className="section-heading">
                 <h2 id="details-title"><span className="step-number">01</span> Data diri</h2>
@@ -247,11 +304,16 @@ export default function App() {
                 {!fits.nameFits && <p id="name-error" className="field-error">Nama terlalu panjang untuk template. Gunakan nama yang lebih singkat.</p>}
               </div>
               <div className="field">
-                <label htmlFor="card-position">Jabatan <span aria-hidden="true">*</span></label>
-                <input id="card-position" type="text" autoComplete="organization-title" placeholder="Contoh: Koordinator acara" required maxLength={120} value={position}
-                  aria-invalid={!fits.positionFits} aria-describedby={!fits.positionFits ? 'position-error' : undefined} disabled={exporting}
-                  onChange={(event) => { setPosition(event.target.value); clearDownloadMessage() }} />
-                {!fits.positionFits && <p id="position-error" className="field-error">Jabatan terlalu panjang untuk template. Singkat teks agar tetap terbaca.</p>}
+                <label htmlFor={detailInputId}>{variant.detailLabel} <span aria-hidden="true">*</span></label>
+                <input id={detailInputId} type="text" autoComplete={kind === 'panitia' ? 'organization-title' : 'organization'}
+                  placeholder={kind === 'panitia' ? 'Contoh: Koordinator acara' : 'Contoh: SMP Negeri 1 Kepenuhan'} required maxLength={120} value={detailValue}
+                  aria-invalid={!fits.detailFits} aria-describedby={!fits.detailFits ? 'detail-error' : undefined} disabled={exporting}
+                  onChange={(event) => {
+                    if (kind === 'panitia') setPosition(event.target.value)
+                    else setPangkalan(event.target.value)
+                    clearDownloadMessage()
+                  }} />
+                {!fits.detailFits && <p id="detail-error" className="field-error">{variant.detailLabel} terlalu panjang untuk template. Singkat teks agar tetap terbaca.</p>}
               </div>
             </section>
 
@@ -306,21 +368,21 @@ export default function App() {
 
             <div className="editor-footer">
               <p><span className="privacy-symbol" aria-hidden="true" />Data dan foto diproses di perangkat Anda.</p>
-              <button type="button" className="reset-button" disabled={exporting || (!name && !position && !photo && !uploading)} onClick={reset}>Reset</button>
+              <button type="button" className="reset-button" disabled={exporting || (!name && !position && !pangkalan && !photo && !uploading)} onClick={reset}>Reset</button>
             </div>
           </form>
         </section>
 
         <section className="preview-column" aria-labelledby="preview-title">
           <div className="preview-heading">
-            <h2 id="preview-title">Preview kartu</h2>
+            <div className="preview-title-group"><h2 id="preview-title">Preview kartu</h2><span className="preview-kind" data-card-kind={kind}>{variant.label}</span></div>
             <span className={`status-badge${ready ? ' is-ready' : ''}`} role="status"><span aria-hidden="true" />{statusLabel}</span>
           </div>
-          <div className="preview-stage" aria-busy={!template || previewUpdating}>
+          <div className="preview-stage" aria-busy={!templateMatchesKind || previewUpdating}>
             <div className="card-frame">
               <canvas ref={canvasRef} width={CARD_WIDTH} height={CARD_HEIGHT} role="img"
-                aria-label={`Preview ID card. Nama: ${name.trim().toLocaleUpperCase('id-ID') || 'belum diisi'}. Jabatan: ${position.trim().toLocaleUpperCase('id-ID') || 'belum diisi'}. Foto: ${photo ? 'ditambahkan' : 'opsional, belum ditambahkan'}.`} />
-              {!template && <div className="template-loading"><span className="loading-card" aria-hidden="true" /><p>{templateError ? 'Template belum tersedia' : 'Menyiapkan template…'}</p></div>}
+                aria-label={`Preview ID card ${variant.label}. Nama: ${name.trim().toLocaleUpperCase('id-ID') || 'belum diisi'}. ${variant.detailLabel}: ${detailValue.trim().toLocaleUpperCase('id-ID') || 'belum diisi'}. Foto: ${photo ? 'ditambahkan' : 'opsional, belum ditambahkan'}.`} />
+              {!templateMatchesKind && <div className="template-loading"><span className="loading-card" aria-hidden="true" /><p>{templateError ? 'Template belum tersedia' : `Menyiapkan template ${variant.label.toLowerCase()}…`}</p></div>}
             </div>
           </div>
           <div className="export-spec"><span>{CARD_WIDTH} × {CARD_HEIGHT} px · PNG</span><span>Foto {PHOTO_SIZE_CM.width} × {PHOTO_SIZE_CM.height} cm · {PRINT_DPI} DPI</span></div>
@@ -328,7 +390,7 @@ export default function App() {
             <span className={`download-symbol${exporting ? ' is-processing' : ''}`} aria-hidden="true" />
             {exporting ? 'Menyiapkan PNG…' : 'Unduh PNG'}
           </button>
-          <p id="download-hint" className="download-hint">{ready ? photo ? 'Kartu Anda siap. Simpan dan gunakan.' : 'Kartu siap diunduh tanpa foto.' : 'Lengkapi nama dan jabatan untuk mengunduh. Foto opsional.'}</p>
+          <p id="download-hint" className="download-hint">{ready ? photo ? 'Kartu Anda siap. Simpan dan gunakan.' : 'Kartu siap diunduh tanpa foto.' : `Lengkapi nama dan ${variant.detailLabel.toLowerCase()} untuk mengunduh. Foto opsional.`}</p>
           {(templateError || renderError || downloadError) && <p className="preview-error" role="alert">{templateError || renderError || downloadError}</p>}
           {downloadStatus && <p className="download-success" role="status">{downloadStatus}</p>}
         </section>

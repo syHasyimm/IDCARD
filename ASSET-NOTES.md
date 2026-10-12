@@ -47,4 +47,16 @@ Invariants: Preserve everything outside the two former bar areas exactly. Keep t
 This is object removal from the supplied design, NOT a redesign. Do not retouch the typography, redraw the logos, sharpen the watermark, alter color grading, or change the layout.
 ```
 
+## Peserta template — exact supplied asset
+
+- Source: clean participant template supplied by the user, `Template ID Card Kembang Gerapah (1).png`.
+- Project asset: `public/assets/template-peserta.png`.
+- Dimensions: 1240 × 1748 pixels; embedded resolution is approximately 300 DPI (299.9994).
+- Method: exact filesystem copy. SHA-256 comparison confirmed the project asset is byte-for-byte identical to the supplied file.
+- No imagegen, raster edit, reconstruction, redesign, resizing, or color conversion was used.
+- Preserved the supplied red panel/colors, white torn divider, top event logo and wording, vertical PESERTA lettering/shadow, faint event watermark, and bottom-right decorative shapes.
+- Metadata was also preserved with the exact copy: PNG contains pHYs, iTXt/XMP, and eXIf chunks. The template's supplied file metadata is distinct from user form/photo data, which remains in browser memory.
+- Existing Panitia template assets were left unchanged.
+
+
 

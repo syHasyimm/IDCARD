@@ -1,6 +1,6 @@
 **Kartu. — Generator ID Card**
 
-Aplikasi React + TypeScript + Vite dengan satu template tetap, input Nama/Jabatan dan foto opsional, crop foto, preview otomatis, serta unduhan PNG. Nama dan jabatan otomatis ditampilkan UPPERCASE. Semua pengolahan data berjalan di browser.
+Aplikasi React + TypeScript + Vite dengan tab Panitia dan Peserta, foto opsional, crop foto, preview otomatis, serta unduhan PNG. Panitia membutuhkan Nama dan Jabatan; Peserta membutuhkan Nama dan Pangkalan. Semua teks ditampilkan UPPERCASE. Semua pengolahan data berjalan di browser.
 
 Jalankan dari folder proyek:
 
@@ -20,17 +20,19 @@ Hasil build ada di `dist/`. Sajikan folder tersebut melalui hosting statis. Node
 
 Penggunaan:
 
-1. Isi nama dan jabatan.
+1. Pilih tab Panitia atau Peserta. Isi Nama dan Jabatan untuk Panitia, atau Nama dan Pangkalan untuk Peserta.
 2. Jika ingin menambahkan foto, pilih JPG/PNG maksimal 10 MB; resolusi maksimal 40 MP dan sisi maksimal 12.000 px. Foto boleh dikosongkan.
 3. Geser foto pada editor dan atur zoom.
 4. Periksa preview dan klik Unduh PNG.
 5. Reset untuk membuat kartu berikutnya.
 
-Ukuran PNG kartu selalu 1240 × 1748 px. Hanya area foto berukuran 4 × 6 cm dengan rasio 2:3; metadata PNG disetel 300 DPI. Ukuran cetak kartu pada acuan ini sekitar 10,5 × 14,8 cm. Gunakan ukuran asli/100% saat mencetak; penskalaan seluruh kartu akan ikut mengubah ukuran foto. Foto diberi bingkai putih, sedangkan nama dan jabatan ditata dalam dua label sejajar. Tanpa foto, watermark template tetap terlihat dan tidak ada placeholder foto pada hasil unduhan. Foto PNG transparan maupun JPG/PNG berlatar dapat digunakan. Tidak ada penghapus latar otomatis.
+Jabatan dan Pangkalan disimpan terpisah. Nama, foto, dan pengaturan crop dipertahankan saat berpindah tab. Reset membersihkan seluruh data dan foto, sambil mempertahankan pilihan tab. Tab juga dapat dipilih melalui tombol panah, Home, dan End. Nama unduhan membedakan jenis kartu: id-card-panitia-nama.png atau id-card-peserta-nama.png.
+
+Kedua template memakai susunan foto dan label yang sama. Ukuran PNG kartu selalu 1240 × 1748 px. Hanya area foto berukuran 4 × 6 cm dengan rasio 2:3; metadata PNG disetel 300 DPI. Ukuran cetak kartu pada acuan ini sekitar 10,5 × 14,8 cm. Gunakan ukuran asli/100% saat mencetak; penskalaan seluruh kartu akan ikut mengubah ukuran foto. Foto diberi bingkai putih, sedangkan nama dan Jabatan/Pangkalan ditata dalam dua label sejajar. Tanpa foto, watermark template tetap terlihat dan tidak ada placeholder foto pada hasil unduhan. Foto PNG transparan maupun JPG/PNG berlatar dapat digunakan. Tidak ada penghapus latar otomatis.
 
 Data hanya disimpan dalam memori aplikasi, dan tidak diunggah ke server oleh aplikasi. Memuat ulang halaman mengosongkan form. Template dan font disertakan sebagai aset lokal. Akses aplikasi tetap memerlukan penyajian melalui HTTP/HTTPS; aplikasi tidak dirancang dibuka dengan `file://`.
 
-Konfigurasi posisi dan ukuran teks/foto terdapat di `src/lib/card.ts`. Template background terdapat di `public/assets/template-background.png`. Karena sumber dari pengguna sudah berupa gambar gabungan, foto contoh, placeholder, dan label lama dibersihkan dengan imagegen; bagian watermark yang tertutup direkonstruksi. Lihat `ASSET-NOTES.md` untuk batas kesetiaan desain dan prompt yang digunakan. Aset blank dari editor asli dapat menggantikan file tersebut untuk kesetiaan penuh.
+Konfigurasi template, posisi, dan ukuran teks/foto terdapat di `src/lib/card.ts`. Panitia memakai `public/assets/template-background.png`: foto contoh, placeholder, dan label lama dibersihkan dengan imagegen; bagian watermark yang tertutup direkonstruksi. Peserta memakai `public/assets/template-peserta.png`, salinan persis file template kosong pengguna tanpa edit. Lihat `ASSET-NOTES.md` untuk catatan aset dan batas kesetiaan template Panitia.
 
 Verifikasi:
 

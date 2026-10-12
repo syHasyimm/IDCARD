@@ -8,13 +8,18 @@ const photoWidth = PHOTO_SIZE_CM.width * PRINT_DPI / 2.54;
 const photoHeight = PHOTO_SIZE_CM.height * PRINT_DPI / 2.54;
 export const PHOTO_AREA = { x: 810 - photoWidth / 2, y: 600, width: photoWidth, height: photoHeight } as const;
 
+export type CardKind = 'panitia' | 'peserta';
+export const CARD_VARIANTS = {
+  panitia: { label: 'Panitia', detailLabel: 'Jabatan', detailPlaceholder: 'Jabatan Anda', asset: 'template-background.png' },
+  peserta: { label: 'Peserta', detailLabel: 'Pangkalan', detailPlaceholder: 'Pangkalan Anda', asset: 'template-peserta.png' },
+} as const;
+
 export type CropArea = { x: number; y: number; width: number; height: number };
 export type CardData = {
   name: string;
-  position: string;
   photo: HTMLImageElement | null;
   crop: CropArea | null;
-};
+} & ({ kind: 'panitia'; position: string } | { kind: 'peserta'; pangkalan: string });
 
 export const TEMPLATE_CONFIG = {
   width: CARD_WIDTH,
@@ -24,29 +29,34 @@ export const TEMPLATE_CONFIG = {
   position: { x: 480, y: 1610, width: 660, height: 94, fontSize: 42, minFontSize: 28, weight: 600, tracking: 2 },
 } as const;
 
-let templatePromise: Promise<HTMLImageElement> | undefined;
+const templatePromises = new Map<CardKind, Promise<HTMLImageElement>>();
 
-export function loadTemplate(): Promise<HTMLImageElement> {
-  if (!templatePromise) {
-    templatePromise = new Promise((resolve, reject) => {
+export function loadTemplate(kind: CardKind = 'panitia'): Promise<HTMLImageElement> {
+  const cached = templatePromises.get(kind);
+  if (cached) return cached;
+  const promise = new Promise<HTMLImageElement>((resolve, reject) => {
       const image = new Image();
       image.onload = () => {
         Promise.all([
           document.fonts.load('700 80px "Card Sans"'),
           document.fonts.load('600 42px "Card Sans"'),
         ]).then(() => resolve(image), () => {
-          templatePromise = undefined;
+          templatePromises.delete(kind);
           reject(new Error('Font kartu gagal dimuat. Muat ulang halaman untuk mencoba lagi.'));
         });
       };
       image.onerror = () => {
-        templatePromise = undefined;
+        templatePromises.delete(kind);
         reject(new Error('Template belum dapat dimuat. Muat ulang halaman untuk mencoba lagi.'));
       };
-      image.src = `${import.meta.env.BASE_URL}assets/template-background.png`;
+      image.src = `${import.meta.env.BASE_URL}assets/${CARD_VARIANTS[kind].asset}`;
     });
-  }
-  return templatePromise;
+  templatePromises.set(kind, promise);
+  return promise;
+}
+
+function cardDetail(data: CardData): string {
+  return data.kind === 'peserta' ? data.pangkalan : data.position;
 }
 
 function fitText(
@@ -122,7 +132,7 @@ export function renderCard(
   canvas: HTMLCanvasElement,
   template: HTMLImageElement,
   data: CardData,
-): { nameFits: boolean; positionFits: boolean } {
+): { nameFits: boolean; detailFits: boolean } {
   canvas.width = CARD_WIDTH;
   canvas.height = CARD_HEIGHT;
   // Use the same rasterization path for displayed preview and detached export.
@@ -165,19 +175,19 @@ export function renderCard(
 
   return {
     nameFits: drawLabel(context, data.name, 'Nama Anda', TEMPLATE_CONFIG.name),
-    positionFits: drawLabel(context, data.position, 'Jabatan Anda', TEMPLATE_CONFIG.position),
+    detailFits: drawLabel(context, cardDetail(data), CARD_VARIANTS[data.kind].detailPlaceholder, TEMPLATE_CONFIG.position),
   };
 }
 
 export async function exportPng(template: HTMLImageElement, data: CardData): Promise<Blob> {
-  if (!data.name.trim() || !data.position.trim() || (data.photo && !data.crop)) {
-    throw new Error('Lengkapi nama dan jabatan sebelum mengunduh. Tunggu foto selesai diproses jika Anda menambahkannya.');
+  if (!data.name.trim() || !cardDetail(data).trim() || (data.photo && !data.crop)) {
+    throw new Error(`Lengkapi nama dan ${CARD_VARIANTS[data.kind].detailLabel.toLowerCase()} sebelum mengunduh. Tunggu foto selesai diproses jika Anda menambahkannya.`);
   }
   await document.fonts.ready;
   const canvas = document.createElement('canvas');
   const result = renderCard(canvas, template, data);
-  if (!result.nameFits || !result.positionFits) {
-    throw new Error('Teks terlalu panjang. Singkat nama atau jabatan sebelum mengunduh.');
+  if (!result.nameFits || !result.detailFits) {
+    throw new Error(`Teks terlalu panjang. Singkat nama atau ${CARD_VARIANTS[data.kind].detailLabel.toLowerCase()} sebelum mengunduh.`);
   }
   const imageBlob = await new Promise<Blob>((resolve, reject) => {
     canvas.toBlob((blob) => {
@@ -188,10 +198,10 @@ export async function exportPng(template: HTMLImageElement, data: CardData): Pro
   return withPrintResolution(imageBlob, PRINT_DPI);
 }
 
-export function makeFilename(name: string): string {
+export function makeFilename(name: string, kind: CardKind = 'panitia'): string {
   const safe = name.normalize('NFKD').replace(/[\u0300-\u036f]/g, '')
     .toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 80);
-  return `id-card-${safe || 'panitia'}.png`;
+  return `id-card-${kind}-${safe || 'kartu'}.png`;
 }
 
 export function downloadBlob(blob: Blob, filename: string): void {
