@@ -5,6 +5,8 @@ import {
   CARD_HEIGHT,
   CARD_WIDTH,
   PHOTO_AREA,
+  PHOTO_SIZE_CM,
+  PRINT_DPI,
   downloadBlob,
   exportPng,
   loadTemplate,
@@ -95,8 +97,8 @@ export default function App() {
     return () => { cancelled = true }
   }, [template, name, position, photo, crop])
 
-  const completedFields = Number(Boolean(name.trim())) + Number(Boolean(position.trim())) + Number(Boolean(photo))
-  const ready = Boolean(template && name.trim() && position.trim() && photo && crop
+  const completedFields = Number(Boolean(name.trim())) + Number(Boolean(position.trim()))
+  const ready = Boolean(template && name.trim() && position.trim() && (!photo || crop)
     && fits.nameFits && fits.positionFits && !templateError && !renderError
     && !uploading && !exporting && !previewUpdating)
 
@@ -227,15 +229,15 @@ export default function App() {
         <section className="editor" aria-labelledby="page-title">
           <div className="intro">
             <p className="eyebrow">ID CARD GENERATOR</p>
-            <h1 id="page-title">Satu foto.<br />Satu kartu.</h1>
-            <p className="intro-copy">Tambahkan data Anda. Kartu langsung terbentuk,<br className="desktop-break" /> siap dibawa ke acara.</p>
+            <h1 id="page-title">Buat ID card.</h1>
+            <p className="intro-copy">Isi nama dan jabatan. Tambahkan foto jika perlu,<br className="desktop-break" /> lalu unduh kartu Anda.</p>
           </div>
 
           <form id="card-form" onSubmit={handleDownload} noValidate>
             <section className="form-section" aria-labelledby="details-title">
               <div className="section-heading">
                 <h2 id="details-title"><span className="step-number">01</span> Data diri</h2>
-                <span className="section-caption">{completedFields}/3 terisi</span>
+                <span className="section-caption">{completedFields}/2 data terisi</span>
               </div>
               <div className="field">
                 <label htmlFor="card-name">Nama lengkap <span aria-hidden="true">*</span></label>
@@ -256,7 +258,7 @@ export default function App() {
             <section className="form-section photo-section" aria-labelledby="photo-title">
               <div className="section-heading">
                 <h2 id="photo-title"><span className="step-number">02</span> Foto Anda</h2>
-                <span className="section-caption">JPG / PNG · maks. 10 MB</span>
+                <span className="section-caption">{PHOTO_SIZE_CM.width} × {PHOTO_SIZE_CM.height} cm · opsional</span>
               </div>
               <input ref={fileRef} className="file-input" id="card-photo" type="file" accept="image/jpeg,image/png" aria-label="Unggah foto JPG atau PNG" tabIndex={-1} disabled={exporting || uploading}
                 onChange={(event) => {
@@ -271,7 +273,7 @@ export default function App() {
                   aria-describedby="photo-hint">
                   <span className="upload-symbol" aria-hidden="true"><span /></span>
                   <span className="upload-title">{uploading ? 'Membuka foto…' : dragging ? 'Lepaskan foto di sini' : 'Pilih foto dari perangkat'}</span>
-                  <span className="upload-description">atau seret dan letakkan di sini</span>
+                  <span className="upload-description">atau seret ke sini · JPG / PNG · maks. 10 MB</span>
                 </button>
               ) : (
                 <div className={`photo-editor${dragging ? ' is-dragging' : ''}`} onDragEnter={onDragEnter} onDragOver={(event) => event.preventDefault()} onDragLeave={onDragLeave} onDrop={onDrop}>
@@ -298,7 +300,7 @@ export default function App() {
                   </div>
                 </div>
               )}
-              <p id="photo-hint" className="field-hint">{photo ? 'Geser foto untuk menyesuaikan posisi wajah.' : 'Gunakan foto yang jelas dengan wajah menghadap depan.'}<br />PNG transparan memberi hasil seperti contoh template.</p>
+              <p id="photo-hint" className="field-hint">{photo ? 'Geser foto untuk menyesuaikan posisi wajah.' : `Foto ${PHOTO_SIZE_CM.width} × ${PHOTO_SIZE_CM.height} cm. Bisa dikosongkan.`}<br />PNG transparan mempertahankan desain latar.</p>
               {photoError && <p className="field-error" role="alert">{photoError}</p>}
             </section>
 
@@ -317,16 +319,16 @@ export default function App() {
           <div className="preview-stage" aria-busy={!template || previewUpdating}>
             <div className="card-frame">
               <canvas ref={canvasRef} width={CARD_WIDTH} height={CARD_HEIGHT} role="img"
-                aria-label={`Preview ID card. Nama: ${name.trim() || 'belum diisi'}. Jabatan: ${position.trim() || 'belum diisi'}. Foto: ${photo ? 'ditambahkan' : 'belum ditambahkan'}.`} />
+                aria-label={`Preview ID card. Nama: ${name.trim().toLocaleUpperCase('id-ID') || 'belum diisi'}. Jabatan: ${position.trim().toLocaleUpperCase('id-ID') || 'belum diisi'}. Foto: ${photo ? 'ditambahkan' : 'opsional, belum ditambahkan'}.`} />
               {!template && <div className="template-loading"><span className="loading-card" aria-hidden="true" /><p>{templateError ? 'Template belum tersedia' : 'Menyiapkan template…'}</p></div>}
             </div>
           </div>
-          <div className="export-spec"><span>{CARD_WIDTH} × {CARD_HEIGHT} px</span><span>PNG · kualitas penuh</span></div>
+          <div className="export-spec"><span>{CARD_WIDTH} × {CARD_HEIGHT} px · PNG</span><span>Foto {PHOTO_SIZE_CM.width} × {PHOTO_SIZE_CM.height} cm · {PRINT_DPI} DPI</span></div>
           <button form="card-form" type="submit" className="download-button" disabled={!ready} aria-describedby="download-hint">
             <span className={`download-symbol${exporting ? ' is-processing' : ''}`} aria-hidden="true" />
             {exporting ? 'Menyiapkan PNG…' : 'Unduh PNG'}
           </button>
-          <p id="download-hint" className="download-hint">{ready ? 'Kartu Anda siap. Simpan dan gunakan.' : 'Lengkapi nama, jabatan, dan foto untuk mengunduh.'}</p>
+          <p id="download-hint" className="download-hint">{ready ? photo ? 'Kartu Anda siap. Simpan dan gunakan.' : 'Kartu siap diunduh tanpa foto.' : 'Lengkapi nama dan jabatan untuk mengunduh. Foto opsional.'}</p>
           {(templateError || renderError || downloadError) && <p className="preview-error" role="alert">{templateError || renderError || downloadError}</p>}
           {downloadStatus && <p className="download-success" role="status">{downloadStatus}</p>}
         </section>

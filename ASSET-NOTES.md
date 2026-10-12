@@ -25,3 +25,26 @@ KEEP BOTH existing dark rounded bottom label bars intact, solid uniform dark aub
 Preserve the large faded watermark emblem behind the photo area; recover only portions that were obscured. Retain all existing areas outside the removed woman/books and the two placeholder text words pixel-faithfully. Use the same portrait 1240 x 1748 composition, edge positions, proportions, and full-frame crop. No border, no padding, no additional text. Opaque background.
 ```
 
+## Background without label bars — composition update
+
+- Source: project asset `public/assets/template-clean.png`, 1056 × 1489 pixels.
+- New asset: `public/assets/template-background.png`, 1056 × 1490 pixels.
+- Method: built-in image_gen edit with `referenced_image_paths`; inspected the result, then copied it into the project. Previous assets were preserved.
+- Change: removed only the two bottom dark rounded label bars and reconstructed the torn brown/white background underneath. The application can now draw aligned labels independently in Canvas.
+- Visual review: both horizontal bars are fully gone. Top event logo and its wording, vertical PANITIA, brown panel, existing torn edge, and faded watermark remain visually consistent with the previous asset. The newly visible torn edge below the watermark is reconstructed.
+- Limitation: generated editing can introduce subtle differences even outside the intended removal area. This asset adds one pixel in height; Canvas should draw it into the canonical card coordinate dimensions.
+- No other application files were modified for this asset update.
+
+### Final edit prompt
+
+```text
+Use case: precise-object-edit.
+Asset type: opaque portrait background PNG for a printable ID card.
+Input image 1 is the EDIT TARGET. Perform a narrowly localized cleanup of this existing design.
+Primary request: Remove ONLY the two dark aubergine horizontal rounded bars near the very bottom of the card. Remove both entire bars, leaving no dark horizontal rounded shape, no shadow, and no residue. Reconstruct only the small background regions formerly covered by these two bars: continue the existing warm brown left torn-paper panel, the irregular vertical dark torn divider, and white right field underneath naturally. The two bars are at approximately x344,y1252,width614,height95 and x191,y1382,width674,height75 at the source image 1056 x 1489 pixel scale.
+Do not add replacement bars, new text, labels, photos, subjects, borders, or decorations. The cleaned bottom area is blank background only.
+Invariants: Preserve everything outside the two former bar areas exactly. Keep the original top event logo at precisely the same location, size, colors, shape, and lettering. Exact unchanged top wording: "KEMAH BESAR", "PENGGALANG", "TITIAN KURANJI", "ULAK PATIAN". Keep the vertical white "PANITIA" title and its shadow unchanged, the warm brown left panel unchanged, the torn-edge shapes unchanged wherever they were already visible, and the large low-opacity colored watermark emblem on the white right side unchanged. Preserve the existing overall proportions and portrait full-frame crop. Same 1056 x 1489 composition. Opaque background.
+This is object removal from the supplied design, NOT a redesign. Do not retouch the typography, redraw the logos, sharpen the watermark, alter color grading, or change the layout.
+```
+
+

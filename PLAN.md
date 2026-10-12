@@ -1,6 +1,6 @@
 **Rencana aplikasi generator ID card**
 
-Keputusan pengguna: aplikasi frontend saja, satu template tetap dari pengguna, input Nama/Jabatan/Foto, dan unduhan PNG saja. Implementasi versi pertama telah dibuat; panduan penggunaan ada di README.md.
+Keputusan pengguna: aplikasi frontend saja, satu template tetap dari pengguna, input Nama/Jabatan dengan Foto opsional, dan unduhan PNG saja. Nama serta Jabatan ditampilkan UPPERCASE. Hanya area foto berukuran 4 × 6 cm dengan acuan 300 DPI; ukuran kartu tetap 1240 × 1748 px. Implementasi telah dibuat; panduan penggunaan ada di README.md.
 
 Template yang diberikan berukuran 1240 × 1748 px dan sudah berisi foto contoh. Aset kosong dibuat melalui imagegen dengan menghapus foto dan placeholder. Bagian watermark yang sebelumnya tertutup direkonstruksi; lihat ASSET-NOTES.md. Hasil PNG tetap berukuran 1240 × 1748 px. Foto JPG/PNG biasa mempertahankan latarnya; gunakan PNG transparan untuk tampilan seperti potongan orang pada contoh asli.
 
@@ -14,7 +14,7 @@ Seluruh pengolahan data dan pembuatan PNG dilakukan di browser. Hosting hanya me
 
 1. Buka aplikasi; template terlihat di area preview.
 2. Isi Nama dan Jabatan.
-3. Pilih foto JPG/JPEG atau PNG dari perangkat.
+3. Jika ingin menambahkan foto, pilih JPG/JPEG atau PNG dari perangkat. Foto boleh dikosongkan.
 4. Geser dan zoom foto agar wajah masuk ke area foto; rasio crop mengikuti template.
 5. Preview diperbarui saat teks atau pengaturan foto berubah.
 6. Klik Unduh PNG setelah input valid dan aset selesai dimuat.
@@ -39,7 +39,9 @@ Template akan dikonfigurasi saat pengembangan. Aplikasi tidak menebak letak teks
 
 **4. Fitur dan aturan versi pertama**
 
-- Nama, Jabatan, dan Foto wajib diisi sebelum mengunduh.
+- Nama dan Jabatan wajib diisi sebelum mengunduh. Foto opsional; tanpa foto, desain watermark tetap terlihat pada hasil.
+- Nama dan Jabatan otomatis UPPERCASE, dengan label sejajar di bawah foto.
+- Area foto memiliki rasio 2:3 dan ukuran cetak 4 × 6 cm pada metadata 300 DPI. Cetak seluruh kartu pada ukuran asli/100% untuk mempertahankan ukuran area foto.
 - Form memiliki label jelas, validasi, dan pesan kegagalan yang bisa dipahami.
 - Usulan batas ukuran foto adalah 10 MB; gambar juga perlu diperiksa agar dimensi hasil decode tidak membebani perangkat.
 - Foto mempertahankan proporsi, mendukung geser dan zoom, serta dipotong mengikuti bentuk area pada template.
