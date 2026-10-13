@@ -1,13 +1,13 @@
 **Verifikasi implementasi — 13 Oktober 2026**
 
-Seluruh kartu Panitia dan Peserta berbentuk portrait dengan lebar 5,5 cm × tinggi 8,5 cm. Build produksi berhasil dan seluruh delapan tes browser versi ini lulus pada 13 Oktober 2026. Pemeriksaan visual PNG dan screenshot desktop/ponsel memastikan susunan foto, logo, serta label tetap proporsional.
+Seluruh kartu Panitia dan Peserta berbentuk portrait dengan lebar 5,5 cm × tinggi 8,5 cm. Area foto 4 × 6 cm dipertahankan, dengan dua label ringkas di bawahnya. Build produksi berhasil dan seluruh delapan tes browser versi final ini lulus pada 13 Oktober 2026. Pemeriksaan visual PNG dan screenshot memastikan susunan foto, logo, serta label berada di dalam kartu.
 
 Cakupan pengujian yang lulus untuk ukuran terbaru:
 
 - Empat skenario pada Chrome desktop dan empat pada Chrome dengan viewport ponsel Pixel 7.
 - Dimensi PNG 650 × 1004 px, diperiksa langsung dari header file.
 - Satu pHYs chunk 300 DPI yang valid, termasuk CRC. Lebar dan tinggi fisik dihitung dari dimensi PNG dan pHYs, dengan toleransi kurang dari 0,01 cm terhadap 5,5 × 8,5 cm.
-- Area foto 2 × 3 cm dengan rasio 2:3, berada sepenuhnya di dalam kartu.
+- Area foto tetap 4 × 6 cm dengan rasio 2:3 sesuai permintaan pengguna sebelumnya, berada sepenuhnya di dalam kartu portrait.
 - Unduhan tanpa foto dan tanpa placeholder foto pada hasil.
 - Nama dan Jabatan/Pangkalan mixed case dirender UPPERCASE pada Canvas hasil ekspor.
 - Tab Peserta menampilkan Nama dan Pangkalan tanpa input Jabatan.

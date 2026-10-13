@@ -131,7 +131,7 @@ test('PNG matches preview, cropping changes result, and reset clears data withou
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
 });
 
-test('photo is optional, labels are uppercase, and portrait card contains a 2 by 3 cm photo', async ({ page }, testInfo) => {
+test('photo is optional, labels are uppercase, and portrait card contains a 4 by 6 cm photo', async ({ page }, testInfo) => {
   await page.addInitScript(() => {
     type Observations = Window & { __cardText: string[]; __photoSizes: number[][] };
     const observations = window as Observations;
@@ -174,8 +174,8 @@ test('photo is optional, labels are uppercase, and portrait card contains a 2 by
   await uploadFixture(page);
   await expect(button).toBeEnabled();
   const size = await page.evaluate(() => (window as Window & { __photoSizes: number[][] }).__photoSizes.at(-1)!);
-  expect(size[0] / (11811 / 100)).toBeCloseTo(2, 3);
-  expect(size[1] / (11811 / 100)).toBeCloseTo(3, 3);
+  expect(size[0] / (11811 / 100)).toBeCloseTo(4, 3);
+  expect(size[1] / (11811 / 100)).toBeCloseTo(6, 3);
   expect(size[0] / size[1]).toBeCloseTo(2 / 3, 8);
   expect(size[2]).toBeGreaterThanOrEqual(0);
   expect(size[3]).toBeGreaterThanOrEqual(0);
@@ -269,8 +269,8 @@ test('participant tab uses Pangkalan and correct template during fast switches',
   const pesertaLabels = await page.locator('canvas').evaluate((canvas: HTMLCanvasElement) => {
     const context = canvas.getContext('2d')!;
     return {
-      name: Array.from(context.getImageData(250, 810, 1, 1).data),
-      pangkalan: Array.from(context.getImageData(250, 930, 1, 1).data),
+      name: Array.from(context.getImageData(155, 902, 1, 1).data),
+      pangkalan: Array.from(context.getImageData(155, 962, 1, 1).data),
     };
   });
   expect(pesertaLabels.name).toEqual([185, 28, 28, 255]);

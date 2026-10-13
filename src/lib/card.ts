@@ -4,10 +4,10 @@ export const PRINT_DPI = 300;
 export const CARD_SIZE_CM = { width: 5.5, height: 8.5 } as const;
 export const CARD_WIDTH = Math.round(CARD_SIZE_CM.width * PRINT_DPI / 2.54);
 export const CARD_HEIGHT = Math.round(CARD_SIZE_CM.height * PRINT_DPI / 2.54);
-export const PHOTO_SIZE_CM = { width: 2, height: 3 } as const;
+export const PHOTO_SIZE_CM = { width: 4, height: 6 } as const;
 const photoWidth = PHOTO_SIZE_CM.width * PRINT_DPI / 2.54;
 const photoHeight = PHOTO_SIZE_CM.height * PRINT_DPI / 2.54;
-export const PHOTO_AREA = { x: 320, y: 330, width: photoWidth, height: photoHeight } as const;
+export const PHOTO_AREA = { x: 140, y: 166, width: photoWidth, height: photoHeight } as const;
 
 export type CardKind = 'panitia' | 'peserta';
 export const CARD_VARIANTS = {
@@ -26,8 +26,8 @@ export const TEMPLATE_CONFIG = {
   width: CARD_WIDTH,
   height: CARD_HEIGHT,
   photo: PHOTO_AREA,
-  name: { x: 255, y: 790, width: 335, height: 78, fontSize: 36, minFontSize: 18, weight: 700, tracking: 0 },
-  position: { x: 255, y: 906, width: 335, height: 60, fontSize: 25, minFontSize: 14, weight: 600, tracking: 0.8 },
+  name: { x: 164, y: 888, width: photoWidth - 48, height: 50, fontSize: 32, minFontSize: 18, weight: 700, tracking: 0 },
+  position: { x: 164, y: 950, width: photoWidth - 48, height: 42, fontSize: 23, minFontSize: 14, weight: 600, tracking: 0.8 },
 } as const;
 
 const templatePromises = new Map<CardKind, Promise<HTMLImageElement>>();
@@ -121,11 +121,11 @@ function drawNameplates(context: CanvasRenderingContext2D, kind: CardKind): void
   context.save();
   context.fillStyle = colors.name;
   context.beginPath();
-  context.roundRect(235, 790, 375, 78, 16);
+  context.roundRect(PHOTO_AREA.x, 888, PHOTO_AREA.width, 50, 12);
   context.fill();
   context.fillStyle = colors.detail;
   context.beginPath();
-  context.roundRect(235, 906, 375, 60, 12);
+  context.roundRect(PHOTO_AREA.x, 950, PHOTO_AREA.width, 42, 10);
   context.fill();
   context.restore();
 }
