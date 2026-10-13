@@ -1,27 +1,28 @@
 **Verifikasi implementasi — 13 Oktober 2026**
 
-- Build TypeScript dan Vite berhasil.
-- Versi dengan dua tab sebelumnya lolos delapan tes: empat skenario pada Chrome desktop dan empat pada Chrome dengan viewport ponsel Pixel 7. Perubahan warna label Peserta terbaru lolos dua tes yang difokuskan pada kartu Peserta, masing-masing desktop dan ponsel.
-- Dimensi unduhan PNG diperiksa langsung dari header file: 1240 × 1748 px.
-- Metadata PNG memiliki satu pHYs chunk 300 DPI yang valid, termasuk CRC.
-- Area foto memiliki rasio 2:3 dan ukuran fisik 4 × 6 cm pada acuan cetak tersebut.
-- Unduhan tanpa foto berhasil; tidak ada placeholder foto yang ikut dirender.
-- Nama dan jabatan mixed case dirender UPPERCASE pada Canvas hasil ekspor.
-- Tab Peserta menampilkan Nama dan Pangkalan tanpa input Jabatan; Pangkalan dirender UPPERCASE pada PNG.
-- Pergantian cepat Peserta → Panitia saat aset peserta sengaja diperlambat tetap menghasilkan template yang benar.
-- Navigasi tab dengan keyboard berfungsi; Jabatan dan Pangkalan tetap terpisah saat tab diganti.
-- Nama/foto tetap tersedia saat tab diganti, dan Reset membersihkan data sambil mempertahankan pilihan tab.
-- PNG peserta mempertahankan desain merah asli, dimensi kartu, dan metadata 300 DPI.
-- Label Nama Peserta menggunakan merah tua #B91C1C; label Pangkalan menggunakan #991B1B, dengan teks putih. Preview dan PNG diperiksa secara visual setelah perubahan. Warna label Panitia tetap mengikuti template cokelatnya.
-- Pixel PNG yang diunduh sama dengan pixel preview pada skenario uji.
+Seluruh kartu Panitia dan Peserta berbentuk portrait dengan lebar 5,5 cm × tinggi 8,5 cm. Build produksi berhasil dan seluruh delapan tes browser versi ini lulus pada 13 Oktober 2026. Pemeriksaan visual PNG dan screenshot desktop/ponsel memastikan susunan foto, logo, serta label tetap proporsional.
+
+Cakupan pengujian yang lulus untuk ukuran terbaru:
+
+- Empat skenario pada Chrome desktop dan empat pada Chrome dengan viewport ponsel Pixel 7.
+- Dimensi PNG 650 × 1004 px, diperiksa langsung dari header file.
+- Satu pHYs chunk 300 DPI yang valid, termasuk CRC. Lebar dan tinggi fisik dihitung dari dimensi PNG dan pHYs, dengan toleransi kurang dari 0,01 cm terhadap 5,5 × 8,5 cm.
+- Area foto 2 × 3 cm dengan rasio 2:3, berada sepenuhnya di dalam kartu.
+- Unduhan tanpa foto dan tanpa placeholder foto pada hasil.
+- Nama dan Jabatan/Pangkalan mixed case dirender UPPERCASE pada Canvas hasil ekspor.
+- Tab Peserta menampilkan Nama dan Pangkalan tanpa input Jabatan.
+- Pergantian cepat Peserta → Panitia saat aset Peserta diperlambat tetap menghasilkan template yang benar.
+- Navigasi tab dengan keyboard; Jabatan dan Pangkalan tetap terpisah saat tab diganti.
+- Nama/foto dipertahankan saat tab diganti; Reset membersihkan data sambil mempertahankan pilihan tab.
+- Label Nama Peserta memakai #B91C1C dan Pangkalan memakai #991B1B, dengan teks putih.
+- Pixel PNG yang diunduh sama dengan pixel preview.
 - Zoom dan posisi crop dengan keyboard mengubah preview sebelum tombol panah dilepas.
-- Nama/jabatan yang tidak muat serta input kosong menonaktifkan unduhan.
+- Nama/Jabatan/Pangkalan yang tidak muat serta input kosong menonaktifkan unduhan.
 - File PNG tidak valid dan foto di atas 10 MB ditolak dengan pesan yang jelas.
-- Reset membersihkan formulir dan foto.
 - Tidak ada request upload/POST pada skenario membuat dan mengunduh kartu.
 - Lebar halaman tidak melebihi viewport pada desktop dan ponsel yang diuji.
-- Screenshot awal dan setelah unduh diperiksa secara visual.
+- Screenshot awal dan setelah unduh tersedia untuk pemeriksaan visual susunan portrait.
 
-Browser yang diuji adalah Chrome lokal dengan emulasi viewport ponsel. Safari/iOS fisik dan hasil cetak fisik belum diuji.
+Browser pengujian menggunakan Chrome lokal dengan emulasi viewport ponsel. Safari/iOS fisik dan hasil cetak fisik belum diuji.
 
-Template Panitia menggunakan rekonstruksi imagegen, dengan keterbatasan yang dicatat di ASSET-NOTES.md. Template Peserta adalah salinan persis aset kosong yang disediakan pengguna. Pengguna telah mengizinkan pengunggahan source dan aset template untuk publikasi privat melalui Sites. Aplikasi tetap memproses data dan foto di browser.
+Aset portrait digambar melalui Canvas dengan rasio asli dan potongan tepi seperlunya agar logo tetap proporsional pada ukuran kartu terbaru. Template Panitia menggunakan rekonstruksi imagegen, dengan keterbatasan yang dicatat di ASSET-NOTES.md. File sumber template Peserta tetap merupakan salinan persis aset kosong pengguna. Pengguna telah mengizinkan pengunggahan source dan aset template untuk publikasi privat melalui Sites. Aplikasi tetap memproses data dan foto di browser.

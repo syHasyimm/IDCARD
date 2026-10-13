@@ -58,5 +58,13 @@ This is object removal from the supplied design, NOT a redesign. Do not retouch 
 - Metadata was also preserved with the exact copy: PNG contains pHYs, iTXt/XMP, and eXIf chunks. The template's supplied file metadata is distinct from user form/photo data, which remains in browser memory.
 - Existing Panitia template assets were left unchanged.
 
+## Print size update — 5.5 × 8.5 cm portrait
+
+- Both supplied portrait backgrounds remain unchanged on disk.
+- Canvas uses uniform cover scaling into 650 × 1004 px at 300 DPI. The small horizontal crop is centered; the complete event logo and vertical role lettering remain inside the card.
+- The original artwork is not stretched, regenerated, or retouched for this size change.
+- Optional photos use a 2 × 3 cm area to fit the smaller card. Photo frames and both text labels were resized and repositioned together; the participant labels retain their red palette.
+- PNG dimensions and pHYs metadata yield physical dimensions within 0.01 cm of the nominal 5.5 × 8.5 cm size. Print at 100% rather than fit-to-page.
+
 
 

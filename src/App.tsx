@@ -3,6 +3,7 @@ import type { DragEvent, FormEvent, KeyboardEvent } from 'react'
 import Cropper from 'react-easy-crop'
 import {
   CARD_HEIGHT,
+  CARD_SIZE_CM,
   CARD_WIDTH,
   CARD_VARIANTS,
   PHOTO_AREA,
@@ -379,13 +380,16 @@ export default function App() {
             <span className={`status-badge${ready ? ' is-ready' : ''}`} role="status"><span aria-hidden="true" />{statusLabel}</span>
           </div>
           <div className="preview-stage" aria-busy={!templateMatchesKind || previewUpdating}>
-            <div className="card-frame">
+            <div className="card-frame" style={{ aspectRatio: `${CARD_WIDTH} / ${CARD_HEIGHT}` }}>
               <canvas ref={canvasRef} width={CARD_WIDTH} height={CARD_HEIGHT} role="img"
                 aria-label={`Preview ID card ${variant.label}. Nama: ${name.trim().toLocaleUpperCase('id-ID') || 'belum diisi'}. ${variant.detailLabel}: ${detailValue.trim().toLocaleUpperCase('id-ID') || 'belum diisi'}. Foto: ${photo ? 'ditambahkan' : 'opsional, belum ditambahkan'}.`} />
               {!templateMatchesKind && <div className="template-loading"><span className="loading-card" aria-hidden="true" /><p>{templateError ? 'Template belum tersedia' : `Menyiapkan template ${variant.label.toLowerCase()}…`}</p></div>}
             </div>
           </div>
-          <div className="export-spec"><span>{CARD_WIDTH} × {CARD_HEIGHT} px · PNG</span><span>Foto {PHOTO_SIZE_CM.width} × {PHOTO_SIZE_CM.height} cm · {PRINT_DPI} DPI</span></div>
+          <div className="export-spec">
+            <span className="export-size">{CARD_SIZE_CM.width.toLocaleString('id-ID')} × {CARD_SIZE_CM.height.toLocaleString('id-ID')} cm</span>
+            <span>{CARD_WIDTH} × {CARD_HEIGHT} px · PNG · {PRINT_DPI} DPI</span>
+          </div>
           <button form="card-form" type="submit" className="download-button" disabled={!ready} aria-describedby="download-hint">
             <span className={`download-symbol${exporting ? ' is-processing' : ''}`} aria-hidden="true" />
             {exporting ? 'Menyiapkan PNG…' : 'Unduh PNG'}

@@ -59,7 +59,7 @@ h1, h2, p { margin: 0; }
 .brand-mark::after { content: ''; width: 11px; height: 3px; border-radius: 2px; position: absolute; left: 4px; bottom: 4px; background: var(--accent); }
 .template-tag { display: flex; align-items: center; gap: 11px; color: #5a5056; font-size: 12px; font-weight: 500; }
 .template-tag > span { font-size: 10px; color: #77666b; border: 1px solid #d5c8c4; background: #eee7e2; padding: 4px 8px; border-radius: 5px; }
-.workspace { display: grid; grid-template-columns: minmax(0, 430px) minmax(0, 420px); justify-content: space-between; gap: 64px; padding: 45px 34px 46px; align-items: start; }
+.workspace { display: grid; grid-template-columns: minmax(0, 400px) minmax(0, 420px); justify-content: space-between; gap: 64px; padding: 45px 34px 46px; align-items: start; }
 .intro { margin-bottom: 31px; }
 .eyebrow { font-size: 10px; font-weight: 600; letter-spacing: 1.8px; color: #816b63; margin-bottom: 13px; }
 h1 { font-size: clamp(35px, 4.1vw, 47px); letter-spacing: -2.3px; line-height: 1.15; font-weight: 600; }
@@ -127,7 +127,7 @@ h1 { font-size: clamp(35px, 4.1vw, 47px); letter-spacing: -2.3px; line-height: 1
 .status-badge.is-ready { color: #805343; background: #ebdcd4; }
 .status-badge.is-ready > span { background: #875f4e; }
 .preview-stage { padding: 24px; border: 1px solid #e2dcd6; border-radius: 13px; background: #eee9e3; }
-.card-frame { position: relative; width: 100%; max-width: 376px; margin: 0 auto; aspect-ratio: 1240 / 1748; background: #fff; box-shadow: 0 5px 18px #59423c14; }
+.card-frame { position: relative; width: 100%; max-width: 376px; margin: 0 auto; background: #fff; box-shadow: 0 5px 18px #59423c14; }
 .card-frame canvas { width: 100%; height: auto; display: block; }
 .template-loading { display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 17px; position: absolute; inset: 0; background: #fff; color: #8b7870; text-align: center; }
 .template-loading p { font-size: 11px; max-width: 180px; line-height: 1.7; }
@@ -136,6 +136,7 @@ h1 { font-size: clamp(35px, 4.1vw, 47px); letter-spacing: -2.3px; line-height: 1
 .loading-card::after { content: ''; position: absolute; left: 8px; right: 8px; height: 2px; bottom: 9px; background: #cdb9ac; }
 .export-spec { display: flex; align-items: center; justify-content: space-between; gap: 12px; font-size: 10px; color: #78696a; padding: 12px 1px 17px; line-height: 1.7; }
 .export-spec span:last-child { text-align: right; }
+.export-size { font-weight: 600; color: #66524e; font-size: 11px; white-space: nowrap; }
 .download-button { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; min-height: 49px; padding: 13px 20px; background: var(--ink); color: #fff; border: 1px solid var(--ink); border-radius: 7px; font-size: 13px; font-weight: 500; white-space: nowrap; }
 .download-button:hover:not(:disabled) { background: #493540; border-color: #493540; }
 .download-button:disabled { background: #e1dcd6; border-color: #e1dcd6; color: #81746e; }
@@ -193,6 +194,7 @@ h1 { font-size: clamp(35px, 4.1vw, 47px); letter-spacing: -2.3px; line-height: 1
   .status-badge { font-size: 10px; }
   .preview-stage { padding: 20px; }
   .export-spec { font-size: 10px; }
+  .export-size { font-size: 11px; }
   .download-button { min-height: 51px; font-size: 13px; }
   .download-hint { font-size: 10px; }
   .crop-container { height: 270px; }

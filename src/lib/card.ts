@@ -1,12 +1,13 @@
 import { withPrintResolution } from './png';
 
-export const CARD_WIDTH = 1240;
-export const CARD_HEIGHT = 1748;
 export const PRINT_DPI = 300;
-export const PHOTO_SIZE_CM = { width: 4, height: 6 } as const;
+export const CARD_SIZE_CM = { width: 5.5, height: 8.5 } as const;
+export const CARD_WIDTH = Math.round(CARD_SIZE_CM.width * PRINT_DPI / 2.54);
+export const CARD_HEIGHT = Math.round(CARD_SIZE_CM.height * PRINT_DPI / 2.54);
+export const PHOTO_SIZE_CM = { width: 2, height: 3 } as const;
 const photoWidth = PHOTO_SIZE_CM.width * PRINT_DPI / 2.54;
 const photoHeight = PHOTO_SIZE_CM.height * PRINT_DPI / 2.54;
-export const PHOTO_AREA = { x: 810 - photoWidth / 2, y: 600, width: photoWidth, height: photoHeight } as const;
+export const PHOTO_AREA = { x: 320, y: 330, width: photoWidth, height: photoHeight } as const;
 
 export type CardKind = 'panitia' | 'peserta';
 export const CARD_VARIANTS = {
@@ -25,8 +26,8 @@ export const TEMPLATE_CONFIG = {
   width: CARD_WIDTH,
   height: CARD_HEIGHT,
   photo: PHOTO_AREA,
-  name: { x: 480, y: 1460, width: 660, height: 120, fontSize: 72, minFontSize: 34, weight: 700, tracking: 0 },
-  position: { x: 480, y: 1610, width: 660, height: 94, fontSize: 42, minFontSize: 28, weight: 600, tracking: 2 },
+  name: { x: 255, y: 790, width: 335, height: 78, fontSize: 36, minFontSize: 18, weight: 700, tracking: 0 },
+  position: { x: 255, y: 906, width: 335, height: 60, fontSize: 25, minFontSize: 14, weight: 600, tracking: 0.8 },
 } as const;
 
 const templatePromises = new Map<CardKind, Promise<HTMLImageElement>>();
@@ -120,13 +121,22 @@ function drawNameplates(context: CanvasRenderingContext2D, kind: CardKind): void
   context.save();
   context.fillStyle = colors.name;
   context.beginPath();
-  context.roundRect(440, 1460, 740, 120, 24);
+  context.roundRect(235, 790, 375, 78, 16);
   context.fill();
   context.fillStyle = colors.detail;
   context.beginPath();
-  context.roundRect(440, 1610, 740, 94, 18);
+  context.roundRect(235, 906, 375, 60, 12);
   context.fill();
   context.restore();
+}
+
+function drawPortraitBackground(context: CanvasRenderingContext2D, template: HTMLImageElement): void {
+  // Cover the new print ratio without stretching the supplied artwork.
+  // The slight crop is centered; the event logo and role lettering remain inside.
+  const scale = Math.max(CARD_WIDTH / template.naturalWidth, CARD_HEIGHT / template.naturalHeight);
+  const width = template.naturalWidth * scale;
+  const height = template.naturalHeight * scale;
+  context.drawImage(template, (CARD_WIDTH - width) / 2, (CARD_HEIGHT - height) / 2, width, height);
 }
 
 export function renderCard(
@@ -142,21 +152,21 @@ export function renderCard(
   if (!context) throw new Error('Browser ini belum mendukung pembuatan kartu.');
   context.imageSmoothingEnabled = true;
   context.imageSmoothingQuality = 'high';
-  context.drawImage(template, 0, 0, CARD_WIDTH, CARD_HEIGHT);
+  drawPortraitBackground(context, template);
 
   if (data.photo && data.crop && data.crop.width > 0 && data.crop.height > 0) {
     const { x, y, width, height } = PHOTO_AREA;
     context.save();
     context.fillStyle = '#ffffff';
     context.shadowColor = 'rgba(49, 36, 45, 0.16)';
-    context.shadowBlur = 28;
-    context.shadowOffsetY = 10;
+    context.shadowBlur = 16;
+    context.shadowOffsetY = 5;
     context.beginPath();
-    context.roundRect(x - 10, y - 10, width + 20, height + 20, 20);
+    context.roundRect(x - 7, y - 7, width + 14, height + 14, 14);
     context.fill();
     context.shadowColor = 'transparent';
     context.beginPath();
-    context.roundRect(x, y, width, height, 12);
+    context.roundRect(x, y, width, height, 8);
     context.clip();
     context.drawImage(
       data.photo,

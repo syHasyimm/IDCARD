@@ -1,21 +1,21 @@
 **Rencana aplikasi generator ID card**
 
-Keputusan pengguna terbaru: aplikasi frontend saja dengan tab Panitia dan Peserta. Panitia membutuhkan Nama dan Jabatan; Peserta membutuhkan Nama dan Pangkalan. Foto opsional dan unduhan PNG untuk keduanya. Seluruh teks ditampilkan UPPERCASE. Foto dan kedua label menggunakan posisi yang sama pada kedua template. Hanya area foto berukuran 4 × 6 cm dengan acuan 300 DPI; ukuran kartu tetap 1240 × 1748 px. Implementasi telah dibuat; panduan penggunaan ada di README.md.
+Keputusan pengguna terbaru: aplikasi frontend saja dengan tab Panitia dan Peserta. Panitia membutuhkan Nama dan Jabatan; Peserta membutuhkan Nama dan Pangkalan. Foto opsional dan unduhan PNG untuk keduanya. Seluruh teks ditampilkan UPPERCASE. **Seluruh kartu berukuran lebar 5,5 cm × tinggi 8,5 cm, berorientasi portrait.** Hasil PNG 650 × 1004 px dengan metadata 300 DPI; selisih ukuran fisik dari pembulatan piksel kurang dari 0,01 cm. Area foto berukuran 2 × 3 cm. Susunan foto pada area kanan dan dua label di bawah foto sama untuk kedua template. Panduan penggunaan ada di README.md.
 
 Nama/foto dipertahankan saat tab diganti, sementara Jabatan dan Pangkalan disimpan terpisah. Reset membersihkan kedua set data dan foto. Template peserta menggunakan salinan persis file yang disediakan pengguna. Rencana versi pertama di bawah mencatat cakupan awal, dengan perluasan dua tab tersebut sebagai keputusan terbaru.
 
-Template yang diberikan berukuran 1240 × 1748 px dan sudah berisi foto contoh. Aset kosong dibuat melalui imagegen dengan menghapus foto dan placeholder. Bagian watermark yang sebelumnya tertutup direkonstruksi; lihat ASSET-NOTES.md. Hasil PNG tetap berukuran 1240 × 1748 px. Foto JPG/PNG biasa mempertahankan latarnya; gunakan PNG transparan untuk tampilan seperti potongan orang pada contoh asli.
+Template sumber berbentuk portrait; template Panitia asli berukuran 1240 × 1748 px dan sudah berisi foto contoh. Aset kosong dibuat melalui imagegen dengan menghapus foto dan placeholder. Bagian watermark yang sebelumnya tertutup direkonstruksi; lihat ASSET-NOTES.md. Template Peserta adalah aset kosong pengguna. Untuk ukuran terbaru, kedua aset digambar melalui Canvas dengan rasio asli dan potongan tepi seperlunya tanpa meregangkan logo. Foto JPG/PNG biasa mempertahankan latarnya; gunakan PNG transparan jika ingin latar foto transparan.
 
 **1. Tujuan dan cakupan versi pertama**
 
-Aplikasi web satu halaman untuk membuat satu ID card per proses. Pengguna mengisi nama dan jabatan, memilih foto dari perangkat, mengatur potongan foto, lalu mengunduh hasil sesuai template yang sudah ditetapkan.
+Aplikasi web satu halaman untuk membuat satu ID card per proses. Pengguna memilih Panitia atau Peserta, mengisi Nama dan Jabatan/Pangkalan, menambahkan foto opsional, mengatur potongan foto, lalu mengunduh PNG sesuai template.
 
 Seluruh pengolahan data dan pembuatan PNG dilakukan di browser. Hosting hanya menyajikan file aplikasi dan aset template. Data pribadi dan foto tidak dikirim ke server oleh aplikasi. Data formulir disimpan sementara dalam memori aplikasi; memuat ulang halaman mengosongkan formulir.
 
 **2. Alur penggunaan**
 
 1. Buka aplikasi; template terlihat di area preview.
-2. Isi Nama dan Jabatan.
+2. Pilih Panitia atau Peserta, lalu isi Nama dan Jabatan/Pangkalan sesuai tab.
 3. Jika ingin menambahkan foto, pilih JPG/JPEG atau PNG dari perangkat. Foto boleh dikosongkan.
 4. Geser dan zoom foto agar wajah masuk ke area foto; rasio crop mengikuti template.
 5. Preview diperbarui saat teks atau pengaturan foto berubah.
@@ -31,7 +31,7 @@ Tidak diperlukan langkah generate terpisah karena preview dibuat otomatis. Tombo
 | Template kosong | PNG resolusi tinggi, tanpa contoh nama/jabatan/foto yang sudah menyatu ke desain. Logo dan elemen dekoratif tetap boleh menyatu. |
 | Contoh kartu jadi | Referensi penempatan, ukuran teks, dan potongan foto yang diharapkan. |
 | Ukuran dan orientasi | Lebar dan tinggi kartu; portrait atau landscape. Jika untuk cetak, sertakan ukuran fisik dalam mm/cm. |
-| Area Nama dan Jabatan | Posisi, batas lebar/tinggi, perataan, warna, serta aturan huruf kapital. |
+| Area Nama dan Jabatan/Pangkalan | Posisi, batas lebar/tinggi, perataan, warna, serta aturan huruf kapital. |
 | Font | Nama font dan file font yang boleh digunakan/disertakan, jika desain memakai font khusus. |
 | Area Foto | Posisi, ukuran, bentuk, dan apakah foto berada di bawah bingkai dekoratif. |
 
@@ -41,9 +41,9 @@ Template akan dikonfigurasi saat pengembangan. Aplikasi tidak menebak letak teks
 
 **4. Fitur dan aturan versi pertama**
 
-- Nama dan Jabatan wajib diisi sebelum mengunduh. Foto opsional; tanpa foto, desain watermark tetap terlihat pada hasil.
-- Nama dan Jabatan otomatis UPPERCASE, dengan label sejajar di bawah foto.
-- Area foto memiliki rasio 2:3 dan ukuran cetak 4 × 6 cm pada metadata 300 DPI. Cetak seluruh kartu pada ukuran asli/100% untuk mempertahankan ukuran area foto.
+- Nama dan Jabatan wajib diisi untuk Panitia; Nama dan Pangkalan wajib diisi untuk Peserta. Foto opsional; tanpa foto, desain watermark tetap terlihat pada hasil.
+- Nama dan Jabatan/Pangkalan otomatis UPPERCASE, dengan dua label di bawah foto. Label Peserta menggunakan merah tua sesuai template.
+- Seluruh kartu berukuran lebar 5,5 cm × tinggi 8,5 cm; area foto memiliki rasio 2:3 dan ukuran cetak 2 × 3 cm pada metadata 300 DPI. Cetak pada ukuran asli/100% untuk mempertahankan ukuran tersebut.
 - Form memiliki label jelas, validasi, dan pesan kegagalan yang bisa dipahami.
 - Usulan batas ukuran foto adalah 10 MB; gambar juga perlu diperiksa agar dimensi hasil decode tidak membebani perangkat.
 - Foto mempertahankan proporsi, mendukung geser dan zoom, serta dipotong mengikuti bentuk area pada template.
@@ -53,7 +53,7 @@ Template akan dikonfigurasi saat pengembangan. Aplikasi tidak menebak letak teks
 - Ukuran PNG mengikuti konfigurasi ekspor, tidak bergantung pada ukuran layar atau ukuran preview.
 - Ekspor menunggu template, foto, dan font selesai dimuat.
 - Tombol unduh memiliki status memproses dan mencegah klik berulang selama ekspor.
-- Nama file mengikuti pola id-card-nama.png dengan karakter nama file yang telah dibersihkan.
+- Nama file mengikuti pola id-card-panitia-nama.png atau id-card-peserta-nama.png dengan karakter nama file yang telah dibersihkan.
 - Form dan preview tersusun berdampingan di desktop serta bertumpuk di ponsel.
 - Reset menghapus input dan foto dari state aplikasi, serta melepaskan resource gambar yang tidak lagi dipakai.
 
@@ -78,7 +78,7 @@ Alur data: Form + Foto lokal + Konfigurasi template → Crop foto → Canvas kar
 
 Komponen utama:
 
-- Form data: input nama, jabatan, pilihan foto, dan validasi.
+- Form data: tab jenis kartu, input Nama dan Jabatan/Pangkalan, pilihan foto, dan validasi.
 - Pengaturan foto: rasio, posisi crop, dan zoom.
 - Preview kartu: menampilkan hasil render dengan ukuran tampilan yang responsif.
 - Penyusun kartu: fungsi bersama untuk menggambar semua lapisan.
@@ -100,10 +100,10 @@ Template dan font disertakan sebagai aset aplikasi dari origin yang sama. Foto d
 
 **8. Kriteria selesai**
 
-- Nama, jabatan, dan foto tampil pada posisi yang sesuai template.
+- Nama, Jabatan/Pangkalan, dan foto opsional tampil pada posisi yang sesuai susunan portrait.
 - Crop foto tidak meregangkan wajah atau keluar dari area foto.
 - Nama/jabatan panjang tidak menimpa elemen desain atau terpotong tanpa pemberitahuan.
-- PNG memiliki dimensi ekspor yang konsisten di desktop dan ponsel.
+- PNG memiliki dimensi 650 × 1004 px di desktop dan ponsel, serta metadata ukuran cetak 5,5 × 8,5 cm dengan toleransi 0,01 cm.
 - Preview dan file unduhan cocok secara visual.
 - Foto invalid, gagal dimuat, dan terlalu besar ditangani dengan pesan yang jelas.
 - Pengunduhan diperiksa di Chrome/Edge desktop dan browser ponsel Android/iOS yang tersedia untuk pengujian.

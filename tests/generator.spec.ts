@@ -3,6 +3,10 @@ import type { Page } from '@playwright/test';
 import { readFile } from 'node:fs/promises';
 
 function checkPrintResolution(bytes: Buffer) {
+  const width = bytes.readUInt32BE(16);
+  const height = bytes.readUInt32BE(20);
+  expect(width).toBe(650);
+  expect(height).toBe(1004);
   const physical: Buffer[] = [];
   for (let offset = 8; offset + 12 <= bytes.length;) {
     const length = bytes.readUInt32BE(offset);
@@ -16,6 +20,10 @@ function checkPrintResolution(bytes: Buffer) {
   expect(physical[0][16]).toBe(1);
   // Independently verified CRC for the standard 300 DPI pHYs payload.
   expect(physical[0].readUInt32BE(17)).toBe(0x78a53f76);
+  // Pixel dimensions are rounded to whole pixels at 300 DPI.
+  const pixelsPerCentimeter = physical[0].readUInt32BE(8) / 100;
+  expect(Math.abs(width / pixelsPerCentimeter - 5.5)).toBeLessThan(0.01);
+  expect(Math.abs(height / pixelsPerCentimeter - 8.5)).toBeLessThan(0.01);
 }
 
 async function fingerprint(page: Page) {
@@ -81,8 +89,6 @@ test('PNG matches preview, cropping changes result, and reset clears data withou
   const saved = testInfo.outputPath('id-card.png');
   await download.saveAs(saved);
   const bytes = await readFile(saved);
-  expect(bytes.readUInt32BE(16)).toBe(1240);
-  expect(bytes.readUInt32BE(20)).toBe(1748);
   checkPrintResolution(bytes);
   const pixelComparison = await page.evaluate(async ({ preview, output }) => {
     async function pixels(src: string) {
@@ -94,25 +100,26 @@ test('PNG matches preview, cropping changes result, and reset clears data withou
       canvas.height = image.naturalHeight;
       const context = canvas.getContext('2d')!;
       context.drawImage(image, 0, 0);
-      return context.getImageData(0, 0, canvas.width, canvas.height).data;
+      return { width: canvas.width, height: canvas.height, data: context.getImageData(0, 0, canvas.width, canvas.height).data };
     }
     const [first, second] = await Promise.all([pixels(preview), pixels(output)]);
+    if (first.width !== second.width || first.height !== second.height) throw new Error('Preview and PNG dimensions differ');
     let different = 0;
     let maxDelta = 0;
-    let minX = 1240, minY = 1748, maxX = 0, maxY = 0;
-    for (let i = 0; i < first.length; i++) {
-      const delta = Math.abs(first[i] - second[i]);
+    let minX = first.width, minY = first.height, maxX = 0, maxY = 0;
+    for (let i = 0; i < first.data.length; i++) {
+      const delta = Math.abs(first.data[i] - second.data[i]);
       maxDelta = Math.max(maxDelta, delta);
       if (delta) {
         different++;
         const pixel = Math.floor(i / 4);
-        minX = Math.min(minX, pixel % 1240); maxX = Math.max(maxX, pixel % 1240);
-        minY = Math.min(minY, Math.floor(pixel / 1240)); maxY = Math.max(maxY, Math.floor(pixel / 1240));
+        minX = Math.min(minX, pixel % first.width); maxX = Math.max(maxX, pixel % first.width);
+        minY = Math.min(minY, Math.floor(pixel / first.width)); maxY = Math.max(maxY, Math.floor(pixel / first.width));
       }
     }
     return { different, maxDelta, bounds: { minX, minY, maxX, maxY } };
   }, { preview, output: `data:image/png;base64,${bytes.toString('base64')}` });
-  expect(pixelComparison).toEqual({ different: 0, maxDelta: 0, bounds: { minX: 1240, minY: 1748, maxX: 0, maxY: 0 } });
+  expect(pixelComparison).toEqual({ different: 0, maxDelta: 0, bounds: { minX: 650, minY: 1004, maxX: 0, maxY: 0 } });
   await page.screenshot({ path: testInfo.outputPath('completed.png'), fullPage: true });
   await page.getByRole('button', { name: 'Reset', exact: true }).click();
   await expect(page.getByLabel('Nama lengkap')).toHaveValue('');
@@ -124,7 +131,7 @@ test('PNG matches preview, cropping changes result, and reset clears data withou
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
 });
 
-test('photo is optional, labels are uppercase, and photo renders at 4 by 6 cm', async ({ page }, testInfo) => {
+test('photo is optional, labels are uppercase, and portrait card contains a 2 by 3 cm photo', async ({ page }, testInfo) => {
   await page.addInitScript(() => {
     type Observations = Window & { __cardText: string[]; __photoSizes: number[][] };
     const observations = window as Observations;
@@ -137,7 +144,9 @@ test('photo is optional, labels are uppercase, and photo renders at 4 by 6 cm', 
     };
     const drawImage = CanvasRenderingContext2D.prototype.drawImage;
     CanvasRenderingContext2D.prototype.drawImage = function (...args: Parameters<typeof drawImage>) {
-      if (args.length === 9) observations.__photoSizes.push([args[7], args[8]]);
+      if (args.length === 9 && args[0] instanceof HTMLImageElement && /^(blob:|data:)/.test(args[0].src)) {
+        observations.__photoSizes.push([args[7], args[8], args[5], args[6]]);
+      }
       return drawImage.apply(this, args);
     };
   });
@@ -157,16 +166,21 @@ test('photo is optional, labels are uppercase, and photo renders at 4 by 6 cm', 
     const observed = window as Window & { __cardText: string[]; __photoSizes: number[][] };
     return { text: observed.__cardText, sizes: observed.__photoSizes };
   });
-  expect(observations.text[0]).toBe('SITI NUR AISYAH');
-  expect(observations.text.slice(1).join('')).toBe('KOORDINATOR ACARA');
+  const nameIndex = observations.text.indexOf('SITI NUR AISYAH');
+  expect(nameIndex).toBeGreaterThanOrEqual(0);
+  expect(observations.text.slice(nameIndex + 1).join('')).toBe('KOORDINATOR ACARA');
   expect(observations.sizes).toHaveLength(0);
   await page.screenshot({ path: testInfo.outputPath('without-photo-ui.png'), fullPage: true });
   await uploadFixture(page);
   await expect(button).toBeEnabled();
   const size = await page.evaluate(() => (window as Window & { __photoSizes: number[][] }).__photoSizes.at(-1)!);
-  expect(size[0] / (11811 / 100)).toBeCloseTo(4, 3);
-  expect(size[1] / (11811 / 100)).toBeCloseTo(6, 3);
+  expect(size[0] / (11811 / 100)).toBeCloseTo(2, 3);
+  expect(size[1] / (11811 / 100)).toBeCloseTo(3, 3);
   expect(size[0] / size[1]).toBeCloseTo(2 / 3, 8);
+  expect(size[2]).toBeGreaterThanOrEqual(0);
+  expect(size[3]).toBeGreaterThanOrEqual(0);
+  expect(size[2] + size[0]).toBeLessThanOrEqual(650);
+  expect(size[3] + size[1]).toBeLessThanOrEqual(1004);
   await page.getByRole('button', { name: 'Hapus foto' }).click();
   await expect(button).toBeEnabled();
 });
@@ -244,15 +258,23 @@ test('participant tab uses Pangkalan and correct template during fast switches',
   const saved = testInfo.outputPath('participant.png');
   await download.saveAs(saved);
   const bytes = await readFile(saved);
-  expect(bytes.readUInt32BE(16)).toBe(1240);
-  expect(bytes.readUInt32BE(20)).toBe(1748);
   checkPrintResolution(bytes);
   const text = await page.evaluate(() => (window as Window & { __cardText: string[] }).__cardText);
-  expect(text[0]).toBe('AYU PUTRI');
-  expect(text.slice(1).join('')).toBe('SMP NEGERI 1 KEPENUHAN');
+  const nameIndex = text.indexOf('AYU PUTRI');
+  expect(nameIndex).toBeGreaterThanOrEqual(0);
+  expect(text.slice(nameIndex + 1).join('')).toBe('SMP NEGERI 1 KEPENUHAN');
   const pesertaPixel = await page.locator('canvas').evaluate((canvas: HTMLCanvasElement) => Array.from(canvas.getContext('2d')!.getImageData(15, 15, 1, 1).data));
   expect(pesertaPixel[0]).toBeGreaterThan(240);
   expect(pesertaPixel[1]).toBeLessThan(80);
+  const pesertaLabels = await page.locator('canvas').evaluate((canvas: HTMLCanvasElement) => {
+    const context = canvas.getContext('2d')!;
+    return {
+      name: Array.from(context.getImageData(250, 810, 1, 1).data),
+      pangkalan: Array.from(context.getImageData(250, 930, 1, 1).data),
+    };
+  });
+  expect(pesertaLabels.name).toEqual([185, 28, 28, 255]);
+  expect(pesertaLabels.pangkalan).toEqual([153, 27, 27, 255]);
   await page.screenshot({ path: testInfo.outputPath('participant-ui.png'), fullPage: true });
   await uploadFixture(page);
   await expect(button).toBeEnabled();
