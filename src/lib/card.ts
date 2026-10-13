@@ -5,10 +5,16 @@ export const JPEG_QUALITY = 0.95;
 export const CARD_SIZE_CM = { width: 5.5, height: 8.5 } as const;
 export const CARD_WIDTH = Math.round(CARD_SIZE_CM.width * PRINT_DPI / 2.54);
 export const CARD_HEIGHT = Math.round(CARD_SIZE_CM.height * PRINT_DPI / 2.54);
-export const PHOTO_SIZE_CM = { width: 4, height: 6 } as const;
+export const PHOTO_SIZE_CM = { width: 3, height: 4 } as const;
 const photoWidth = PHOTO_SIZE_CM.width * PRINT_DPI / 2.54;
 const photoHeight = PHOTO_SIZE_CM.height * PRINT_DPI / 2.54;
-export const PHOTO_AREA = { x: 140, y: 166, width: photoWidth, height: photoHeight } as const;
+const nameplateWidth = 4 * PRINT_DPI / 2.54;
+export const PHOTO_AREA = {
+  x: 140 + (nameplateWidth - photoWidth) / 2,
+  y: 270,
+  width: photoWidth,
+  height: photoHeight,
+} as const;
 
 export type CardKind = 'panitia' | 'peserta';
 export const CARD_VARIANTS = {
@@ -27,8 +33,8 @@ export const TEMPLATE_CONFIG = {
   width: CARD_WIDTH,
   height: CARD_HEIGHT,
   photo: PHOTO_AREA,
-  name: { x: 164, y: 888, width: photoWidth - 48, height: 50, fontSize: 32, minFontSize: 18, weight: 700, tracking: 0 },
-  position: { x: 164, y: 950, width: photoWidth - 48, height: 42, fontSize: 23, minFontSize: 14, weight: 600, tracking: 0.8 },
+  name: { x: 164, y: 888, width: nameplateWidth - 48, height: 50, fontSize: 32, minFontSize: 18, weight: 700, tracking: 0 },
+  position: { x: 164, y: 950, width: nameplateWidth - 48, height: 42, fontSize: 23, minFontSize: 14, weight: 600, tracking: 0.8 },
 } as const;
 
 const templatePromises = new Map<CardKind, Promise<HTMLImageElement>>();
@@ -122,11 +128,11 @@ function drawNameplates(context: CanvasRenderingContext2D, kind: CardKind): void
   context.save();
   context.fillStyle = colors.name;
   context.beginPath();
-  context.roundRect(PHOTO_AREA.x, 888, PHOTO_AREA.width, 50, 12);
+  context.roundRect(140, 888, nameplateWidth, 50, 12);
   context.fill();
   context.fillStyle = colors.detail;
   context.beginPath();
-  context.roundRect(PHOTO_AREA.x, 950, PHOTO_AREA.width, 42, 10);
+  context.roundRect(140, 950, nameplateWidth, 42, 10);
   context.fill();
   context.restore();
 }

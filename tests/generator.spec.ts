@@ -141,7 +141,7 @@ test('JPG matches JPEG-encoded preview, cropping changes result, and reset clear
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
 });
 
-test('photo is optional, labels are uppercase, and portrait card contains a 4 by 6 cm photo', async ({ page }, testInfo) => {
+test('photo is optional, labels are uppercase, and portrait card contains a 3 by 4 cm photo', async ({ page }, testInfo) => {
   await page.addInitScript(() => {
     type Observations = Window & { __cardText: string[]; __photoSizes: number[][] };
     const observations = window as Observations;
@@ -184,9 +184,9 @@ test('photo is optional, labels are uppercase, and portrait card contains a 4 by
   await uploadFixture(page);
   await expect(button).toBeEnabled();
   const size = await page.evaluate(() => (window as Window & { __photoSizes: number[][] }).__photoSizes.at(-1)!);
-  expect(size[0] / (300 / 2.54)).toBeCloseTo(4, 3);
-  expect(size[1] / (300 / 2.54)).toBeCloseTo(6, 3);
-  expect(size[0] / size[1]).toBeCloseTo(2 / 3, 8);
+  expect(size[0] / (300 / 2.54)).toBeCloseTo(3, 3);
+  expect(size[1] / (300 / 2.54)).toBeCloseTo(4, 3);
+  expect(size[0] / size[1]).toBeCloseTo(3 / 4, 8);
   expect(size[2]).toBeGreaterThanOrEqual(0);
   expect(size[3]).toBeGreaterThanOrEqual(0);
   expect(size[2] + size[0]).toBeLessThanOrEqual(650);

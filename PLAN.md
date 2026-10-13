@@ -1,6 +1,6 @@
 **Rencana aplikasi generator ID card**
 
-Keputusan pengguna terbaru: aplikasi frontend saja dengan tab Panitia dan Peserta. Panitia membutuhkan Nama dan Jabatan; Peserta membutuhkan Nama dan Pangkalan. Foto opsional dan unduhan **JPG saja** untuk keduanya; unggahan foto tetap mendukung JPG/PNG. Seluruh teks ditampilkan UPPERCASE. **Seluruh kartu berukuran lebar 5,5 cm × tinggi 8,5 cm, berorientasi portrait.** Hasil JPG 650 × 1004 px dengan metadata JFIF 300 DPI dan kualitas JPEG 95%; selisih ukuran fisik dari pembulatan piksel kurang dari 0,01 cm. Area foto tetap 4 × 6 cm sesuai permintaan sebelumnya. Susunan foto dan dua label ringkas di bawahnya sama untuk kedua template. Panduan penggunaan ada di README.md.
+Keputusan pengguna terbaru: aplikasi frontend saja dengan tab Panitia dan Peserta. Panitia membutuhkan Nama dan Jabatan; Peserta membutuhkan Nama dan Pangkalan. Foto opsional dan unduhan **JPG saja** untuk keduanya; unggahan foto tetap mendukung JPG/PNG. Seluruh teks ditampilkan UPPERCASE. **Seluruh kartu berukuran lebar 5,5 cm × tinggi 8,5 cm, berorientasi portrait.** Hasil JPG 650 × 1004 px dengan metadata JFIF 300 DPI dan kualitas JPEG 95%; selisih ukuran fisik dari pembulatan piksel kurang dari 0,01 cm. **Area foto berukuran 3 × 4 cm dengan rasio crop 3:4** sesuai permintaan terbaru. Susunan foto dan dua label ringkas di bawahnya sama untuk kedua template. Panduan penggunaan ada di README.md.
 
 Nama/foto dipertahankan saat tab diganti, sementara Jabatan dan Pangkalan disimpan terpisah. Reset membersihkan kedua set data dan foto. Template peserta menggunakan salinan persis file yang disediakan pengguna. Rencana versi pertama di bawah mencatat cakupan awal, dengan perluasan dua tab tersebut sebagai keputusan terbaru.
 
@@ -43,7 +43,7 @@ Template akan dikonfigurasi saat pengembangan. Aplikasi tidak menebak letak teks
 
 - Nama dan Jabatan wajib diisi untuk Panitia; Nama dan Pangkalan wajib diisi untuk Peserta. Foto opsional; tanpa foto, desain watermark tetap terlihat pada hasil.
 - Nama dan Jabatan/Pangkalan otomatis UPPERCASE, dengan dua label di bawah foto. Label Peserta menggunakan merah tua sesuai template.
-- Seluruh kartu berukuran lebar 5,5 cm × tinggi 8,5 cm; area foto memiliki rasio 2:3 dan ukuran cetak 4 × 6 cm pada metadata 300 DPI. Cetak pada ukuran asli/100% untuk mempertahankan ukuran tersebut.
+- Seluruh kartu berukuran lebar 5,5 cm × tinggi 8,5 cm; area foto Panitia dan Peserta memiliki rasio 3:4 dan ukuran cetak 3 × 4 cm pada metadata 300 DPI. Cetak pada ukuran asli/100% untuk mempertahankan ukuran tersebut.
 - Form memiliki label jelas, validasi, dan pesan kegagalan yang bisa dipahami.
 - Usulan batas ukuran foto adalah 10 MB; gambar juga perlu diperiksa agar dimensi hasil decode tidak membebani perangkat.
 - Foto mempertahankan proporsi, mendukung geser dan zoom, serta dipotong mengikuti bentuk area pada template.

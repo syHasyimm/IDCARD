@@ -1,13 +1,13 @@
 **Verifikasi implementasi — 13 Oktober 2026**
 
-Seluruh kartu Panitia dan Peserta berbentuk portrait dengan lebar 5,5 cm × tinggi 8,5 cm. Area foto 4 × 6 cm dipertahankan, dengan dua label ringkas di bawahnya. Unduhan memakai JPG saja. Build produksi dan seluruh delapan tes browser versi JPG lulus pada 13 Oktober 2026; hasil file JPG juga diperiksa secara visual.
+Seluruh kartu Panitia dan Peserta berbentuk portrait dengan lebar 5,5 cm × tinggi 8,5 cm. Area foto kedua jenis kartu berukuran 3 × 4 cm dengan rasio crop 3:4. Unduhan memakai JPG saja. Build produksi dan seluruh delapan tes browser ukuran foto terbaru lulus pada 13 Oktober 2026; hasil JPG juga diperiksa secara visual.
 
-Cakupan pengujian yang lulus untuk ekspor JPG:
+Cakupan pengujian yang lulus untuk ukuran foto terbaru:
 
 - Empat skenario pada Chrome desktop dan empat pada Chrome dengan viewport ponsel Pixel 7.
 - Signature JPEG SOI/EOI dan dimensi JPG 650 × 1004 px, diperiksa langsung dari header SOF file.
 - Satu segmen JFIF APP0 dengan unit inci dan densitas horizontal/vertikal 300 DPI. Lebar dan tinggi fisik dihitung dari dimensi JPG dan densitas tersebut, dengan toleransi kurang dari 0,01 cm terhadap 5,5 × 8,5 cm.
-- Area foto tetap 4 × 6 cm dengan rasio 2:3 sesuai permintaan pengguna sebelumnya, berada sepenuhnya di dalam kartu portrait.
+- Area foto Panitia dan Peserta 3 × 4 cm dengan rasio 3:4, berada sepenuhnya di dalam kartu portrait.
 - Unduhan tanpa foto dan tanpa placeholder foto pada hasil.
 - Nama dan Jabatan/Pangkalan mixed case dirender UPPERCASE pada Canvas hasil ekspor.
 - Tab Peserta menampilkan Nama dan Pangkalan tanpa input Jabatan.

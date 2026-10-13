@@ -63,7 +63,7 @@ This is object removal from the supplied design, NOT a redesign. Do not retouch 
 - Both supplied portrait backgrounds remain unchanged on disk.
 - Canvas uses uniform cover scaling into 650 × 1004 px at 300 DPI. The small horizontal crop is centered; the complete event logo and vertical role lettering remain inside the card.
 - The original artwork is not stretched, regenerated, or retouched for this size change.
-- Optional photos retain the user's requested 4 × 6 cm area. The logo stays above the photo and both text labels fit below it inside the smaller card; the participant labels retain their red palette.
+- Optional photos use the user's latest requested 3 × 4 cm area, centered over the labels with a 3:4 crop ratio. The logo stays above the photo and both text labels fit below it inside the card; the participant labels retain their red palette.
 - The final JPG dimensions and JFIF 300 DPI metadata yield physical dimensions within 0.01 cm of the nominal 5.5 × 8.5 cm size. Print at 100% rather than fit-to-page. The template assets remain PNG.
 
 
