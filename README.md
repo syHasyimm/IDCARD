@@ -1,6 +1,6 @@
 **Kartu. — Generator ID Card**
 
-Aplikasi React + TypeScript + Vite dengan tab Panitia dan Peserta, foto opsional, crop foto, preview otomatis, serta unduhan PNG. Panitia membutuhkan Nama dan Jabatan; Peserta membutuhkan Nama dan Pangkalan. Semua teks ditampilkan UPPERCASE. Semua pengolahan data berjalan di browser.
+Aplikasi React + TypeScript + Vite dengan tab Panitia dan Peserta, foto opsional, crop foto, preview otomatis, serta unduhan JPG. Panitia membutuhkan Nama dan Jabatan; Peserta membutuhkan Nama dan Pangkalan. Semua teks ditampilkan UPPERCASE. Semua pengolahan data berjalan di browser.
 
 Jalankan dari folder proyek:
 
@@ -23,12 +23,12 @@ Penggunaan:
 1. Pilih tab Panitia atau Peserta. Isi Nama dan Jabatan untuk Panitia, atau Nama dan Pangkalan untuk Peserta.
 2. Jika ingin menambahkan foto, pilih JPG/PNG maksimal 10 MB; resolusi maksimal 40 MP dan sisi maksimal 12.000 px. Foto boleh dikosongkan.
 3. Geser foto pada editor dan atur zoom.
-4. Periksa preview dan klik Unduh PNG.
+4. Periksa preview dan klik Unduh JPG.
 5. Reset untuk membuat kartu berikutnya.
 
-Jabatan dan Pangkalan disimpan terpisah. Nama, foto, dan pengaturan crop dipertahankan saat berpindah tab. Reset membersihkan seluruh data dan foto, sambil mempertahankan pilihan tab. Tab juga dapat dipilih melalui tombol panah, Home, dan End. Nama unduhan membedakan jenis kartu: id-card-panitia-nama.png atau id-card-peserta-nama.png.
+Jabatan dan Pangkalan disimpan terpisah. Nama, foto, dan pengaturan crop dipertahankan saat berpindah tab. Reset membersihkan seluruh data dan foto, sambil mempertahankan pilihan tab. Tab juga dapat dipilih melalui tombol panah, Home, dan End. Nama unduhan membedakan jenis kartu: id-card-panitia-nama.jpg atau id-card-peserta-nama.jpg.
 
-Kedua template memakai susunan portrait yang sama dengan ukuran kartu **lebar 5,5 cm × tinggi 8,5 cm**. PNG berukuran 650 × 1004 px dengan metadata 300 DPI; pembulatan ke piksel utuh menghasilkan selisih ukuran cetak kurang dari 0,01 cm. Gunakan ukuran asli/100% saat mencetak. Area foto tetap berukuran 4 × 6 cm dengan rasio 2:3 sesuai permintaan sebelumnya. Foto diberi bingkai putih, sedangkan nama dan Jabatan/Pangkalan ditata dalam dua label ringkas di bawah foto agar seluruh susunan muat. Label Peserta memakai merah tua agar sesuai template merah. Tanpa foto, watermark desain tetap terlihat dan tidak ada placeholder foto pada hasil unduhan. Foto PNG transparan maupun JPG/PNG berlatar dapat digunakan. Tidak ada penghapus latar otomatis.
+Kedua template memakai susunan portrait yang sama dengan ukuran kartu **lebar 5,5 cm × tinggi 8,5 cm**. JPG berukuran 650 × 1004 px dengan metadata JFIF 300 DPI dan kualitas JPEG 95%; pembulatan ke piksel utuh menghasilkan selisih ukuran cetak kurang dari 0,01 cm. Gunakan ukuran asli/100% saat mencetak. Area foto tetap berukuran 4 × 6 cm dengan rasio 2:3 sesuai permintaan sebelumnya. Foto diberi bingkai putih, sedangkan nama dan Jabatan/Pangkalan ditata dalam dua label ringkas di bawah foto agar seluruh susunan muat. Label Peserta memakai merah tua agar sesuai template merah. Tanpa foto, watermark desain tetap terlihat dan tidak ada placeholder foto pada hasil unduhan. Foto PNG transparan maupun JPG/PNG berlatar dapat digunakan sebagai input; hasil kartu selalu JPG dengan latar desain. Tidak ada penghapus latar otomatis.
 
 Data hanya disimpan dalam memori aplikasi, dan tidak diunggah ke server oleh aplikasi. Memuat ulang halaman mengosongkan form. Template dan font disertakan sebagai aset lokal. Akses aplikasi tetap memerlukan penyajian melalui HTTP/HTTPS; aplikasi tidak dirancang dibuka dengan `file://`.
 
@@ -48,4 +48,4 @@ Referensi Context7 yang dipakai: React (`/reactjs/react.dev`), Vite (`/vitejs/vi
 - https://vite.dev/guide/static-deploy.html
 - https://github.com/valentinh/react-easy-crop
 - https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement/toBlob
-- https://www.w3.org/TR/png-3/#11pHYs
+- https://www.w3.org/Graphics/JPEG/jfif3.pdf

@@ -1,6 +1,6 @@
 **Rencana aplikasi generator ID card**
 
-Keputusan pengguna terbaru: aplikasi frontend saja dengan tab Panitia dan Peserta. Panitia membutuhkan Nama dan Jabatan; Peserta membutuhkan Nama dan Pangkalan. Foto opsional dan unduhan PNG untuk keduanya. Seluruh teks ditampilkan UPPERCASE. **Seluruh kartu berukuran lebar 5,5 cm × tinggi 8,5 cm, berorientasi portrait.** Hasil PNG 650 × 1004 px dengan metadata 300 DPI; selisih ukuran fisik dari pembulatan piksel kurang dari 0,01 cm. Area foto tetap 4 × 6 cm sesuai permintaan sebelumnya. Susunan foto dan dua label ringkas di bawahnya sama untuk kedua template. Panduan penggunaan ada di README.md.
+Keputusan pengguna terbaru: aplikasi frontend saja dengan tab Panitia dan Peserta. Panitia membutuhkan Nama dan Jabatan; Peserta membutuhkan Nama dan Pangkalan. Foto opsional dan unduhan **JPG saja** untuk keduanya; unggahan foto tetap mendukung JPG/PNG. Seluruh teks ditampilkan UPPERCASE. **Seluruh kartu berukuran lebar 5,5 cm × tinggi 8,5 cm, berorientasi portrait.** Hasil JPG 650 × 1004 px dengan metadata JFIF 300 DPI dan kualitas JPEG 95%; selisih ukuran fisik dari pembulatan piksel kurang dari 0,01 cm. Area foto tetap 4 × 6 cm sesuai permintaan sebelumnya. Susunan foto dan dua label ringkas di bawahnya sama untuk kedua template. Panduan penggunaan ada di README.md.
 
 Nama/foto dipertahankan saat tab diganti, sementara Jabatan dan Pangkalan disimpan terpisah. Reset membersihkan kedua set data dan foto. Template peserta menggunakan salinan persis file yang disediakan pengguna. Rencana versi pertama di bawah mencatat cakupan awal, dengan perluasan dua tab tersebut sebagai keputusan terbaru.
 
@@ -8,9 +8,9 @@ Template sumber berbentuk portrait; template Panitia asli berukuran 1240 × 1748
 
 **1. Tujuan dan cakupan versi pertama**
 
-Aplikasi web satu halaman untuk membuat satu ID card per proses. Pengguna memilih Panitia atau Peserta, mengisi Nama dan Jabatan/Pangkalan, menambahkan foto opsional, mengatur potongan foto, lalu mengunduh PNG sesuai template.
+Aplikasi web satu halaman untuk membuat satu ID card per proses. Pengguna memilih Panitia atau Peserta, mengisi Nama dan Jabatan/Pangkalan, menambahkan foto opsional, mengatur potongan foto, lalu mengunduh JPG sesuai template.
 
-Seluruh pengolahan data dan pembuatan PNG dilakukan di browser. Hosting hanya menyajikan file aplikasi dan aset template. Data pribadi dan foto tidak dikirim ke server oleh aplikasi. Data formulir disimpan sementara dalam memori aplikasi; memuat ulang halaman mengosongkan formulir.
+Seluruh pengolahan data dan pembuatan JPG dilakukan di browser. Hosting hanya menyajikan file aplikasi dan aset template. Data pribadi dan foto tidak dikirim ke server oleh aplikasi. Data formulir disimpan sementara dalam memori aplikasi; memuat ulang halaman mengosongkan formulir.
 
 **2. Alur penggunaan**
 
@@ -19,10 +19,10 @@ Seluruh pengolahan data dan pembuatan PNG dilakukan di browser. Hosting hanya me
 3. Jika ingin menambahkan foto, pilih JPG/JPEG atau PNG dari perangkat. Foto boleh dikosongkan.
 4. Geser dan zoom foto agar wajah masuk ke area foto; rasio crop mengikuti template.
 5. Preview diperbarui saat teks atau pengaturan foto berubah.
-6. Klik Unduh PNG setelah input valid dan aset selesai dimuat.
+6. Klik Unduh JPG setelah input valid dan aset selesai dimuat.
 7. Klik Reset untuk membuat kartu berikutnya.
 
-Tidak diperlukan langkah generate terpisah karena preview dibuat otomatis. Tombol unduh menyusun PNG final dengan resolusi ekspor yang telah ditentukan.
+Tidak diperlukan langkah generate terpisah karena preview dibuat otomatis. Tombol unduh menyusun JPG final dengan resolusi ekspor yang telah ditentukan.
 
 **3. Bahan yang dibutuhkan dari pemilik template**
 
@@ -49,11 +49,11 @@ Template akan dikonfigurasi saat pengembangan. Aplikasi tidak menebak letak teks
 - Foto mempertahankan proporsi, mendukung geser dan zoom, serta dipotong mengikuti bentuk area pada template.
 - Foto dari ponsel diperiksa orientasinya agar tidak tampil miring.
 - Nama/jabatan panjang menyesuaikan ukuran font sampai batas keterbacaan. Jika masih tidak muat, tampilkan pesan untuk menyingkat teks. Pembungkusan menjadi beberapa baris hanya dipakai jika sesuai desain template.
-- Preview dan PNG memakai fungsi penyusun kartu serta konfigurasi posisi yang sama.
-- Ukuran PNG mengikuti konfigurasi ekspor, tidak bergantung pada ukuran layar atau ukuran preview.
+- Preview dan JPG memakai fungsi penyusun kartu serta konfigurasi posisi yang sama. JPG menggunakan kompresi JPEG kualitas 95%.
+- Ukuran JPG mengikuti konfigurasi ekspor, tidak bergantung pada ukuran layar atau ukuran preview.
 - Ekspor menunggu template, foto, dan font selesai dimuat.
 - Tombol unduh memiliki status memproses dan mencegah klik berulang selama ekspor.
-- Nama file mengikuti pola id-card-panitia-nama.png atau id-card-peserta-nama.png dengan karakter nama file yang telah dibersihkan.
+- Nama file mengikuti pola id-card-panitia-nama.jpg atau id-card-peserta-nama.jpg dengan karakter nama file yang telah dibersihkan.
 - Form dan preview tersusun berdampingan di desktop serta bertumpuk di ponsel.
 - Reset menghapus input dan foto dari state aplikasi, serta melepaskan resource gambar yang tidak lagi dipakai.
 
@@ -67,14 +67,14 @@ Template akan dikonfigurasi saat pengembangan. Aplikasi tidak menebak letak teks
 | Tampilan responsif | CSS biasa / CSS Modules | Cukup untuk satu halaman dengan kebutuhan styling yang terkontrol. |
 | Crop foto | react-easy-crop | Mendukung rasio crop tetap, geser, zoom, dan koordinat potongan foto. |
 | Penyusunan kartu | Canvas 2D API | Menggambar template, foto, dan teks secara langsung di browser. |
-| Ekspor PNG | Canvas toBlob + Blob URL | Membuat file PNG dan memicu unduhan di perangkat pengguna. |
+| Ekspor JPG | Canvas toBlob + Blob URL + metadata JFIF | Membuat JPEG kualitas 95% dengan acuan cetak 300 DPI, lalu memicu unduhan di perangkat pengguna. |
 | Hosting | Hosting statis, misalnya GitHub Pages | Menyajikan hasil build dan aset aplikasi. |
 
 Node.js digunakan untuk proses pengembangan/build. Aplikasi yang dibuka pengguna tidak membutuhkan proses Node.js di server. Paket crop hanya membantu pengaturan foto; penyusunan kartu tetap memakai Canvas.
 
 **6. Rancangan teknis**
 
-Alur data: Form + Foto lokal + Konfigurasi template → Crop foto → Canvas kartu → Preview → File PNG.
+Alur data: Form + Foto lokal + Konfigurasi template → Crop foto → Canvas kartu → Preview → File JPG.
 
 Komponen utama:
 
@@ -82,7 +82,7 @@ Komponen utama:
 - Pengaturan foto: rasio, posisi crop, dan zoom.
 - Preview kartu: menampilkan hasil render dengan ukuran tampilan yang responsif.
 - Penyusun kartu: fungsi bersama untuk menggambar semua lapisan.
-- Pengunduh: menyiapkan PNG, nama file, status proses, dan penanganan error.
+- Pengunduh: menyiapkan JPG, metadata JFIF 300 DPI, nama file, status proses, dan penanganan error.
 
 Konfigurasi template menyimpan ukuran dasar, resolusi ekspor, koordinat dan batas teks, style font, serta area foto. Urutan gambar mengikuti kebutuhan desain: background, foto, overlay bila ada, lalu teks.
 
@@ -95,7 +95,7 @@ Template dan font disertakan sebagai aset aplikasi dari origin yang sama. Foto d
 | 1. Pemetaan template | Periksa aset, ukuran, font, posisi, urutan lapisan, dan aturan teks panjang. | Konfigurasi template dan satu contoh kartu referensi. |
 | 2. Form dan crop | Buat form responsif, validasi, unggah foto, geser, zoom, dan reset. | Pengguna dapat memasukkan seluruh data dengan benar. |
 | 3. Penyusunan kartu | Gabungkan template, foto, dan teks dengan fungsi render bersama. | Preview mengikuti contoh desain. |
-| 4. Ekspor PNG | Atur resolusi final, tunggu aset, buat file, dan tangani kegagalan. | PNG dapat diunduh dan sesuai preview. |
+| 4. Ekspor JPG | Atur resolusi final dan metadata, tunggu aset, buat file, dan tangani kegagalan. | JPG dapat diunduh dan sesuai preview setelah kompresi JPEG. |
 | 5. Verifikasi dan build | Uji kasus penting, periksa hasil build, dan siapkan untuk hosting statis. | Aplikasi siap dipublikasikan. |
 
 **8. Kriteria selesai**
@@ -103,7 +103,7 @@ Template dan font disertakan sebagai aset aplikasi dari origin yang sama. Foto d
 - Nama, Jabatan/Pangkalan, dan foto opsional tampil pada posisi yang sesuai susunan portrait.
 - Crop foto tidak meregangkan wajah atau keluar dari area foto.
 - Nama/jabatan panjang tidak menimpa elemen desain atau terpotong tanpa pemberitahuan.
-- PNG memiliki dimensi 650 × 1004 px di desktop dan ponsel, serta metadata ukuran cetak 5,5 × 8,5 cm dengan toleransi 0,01 cm.
+- JPG memiliki dimensi 650 × 1004 px di desktop dan ponsel, serta metadata ukuran cetak 5,5 × 8,5 cm dengan toleransi 0,01 cm.
 - Preview dan file unduhan cocok secara visual.
 - Foto invalid, gagal dimuat, dan terlalu besar ditangani dengan pesan yang jelas.
 - Pengunduhan diperiksa di Chrome/Edge desktop dan browser ponsel Android/iOS yang tersedia untuk pengujian.
@@ -120,3 +120,4 @@ PDF, sisi belakang, pilihan beberapa template, generator massal, dan penyimpanan
 - [react-easy-crop: dokumentasi resmi](https://github.com/valentinh/react-easy-crop)
 - [Canvas: penggunaan gambar](https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API/Tutorial/Using_images)
 - [Canvas: ekspor dengan toBlob](https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement/toBlob)
+- [JPEG: spesifikasi metadata JFIF](https://www.w3.org/Graphics/JPEG/jfif3.pdf)

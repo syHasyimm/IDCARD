@@ -10,7 +10,7 @@ import {
   PHOTO_SIZE_CM,
   PRINT_DPI,
   downloadBlob,
-  exportPng,
+  exportJpg,
   loadTemplate,
   makeFilename,
   renderCard,
@@ -245,11 +245,11 @@ export default function App() {
     clearDownloadMessage()
     try {
       await document.fonts.ready
-      const blob = await exportPng(template.image, cardData)
+      const blob = await exportJpg(template.image, cardData)
       downloadBlob(blob, makeFilename(name, kind))
-      setDownloadStatus('PNG siap. Periksa folder unduhan Anda.')
+      setDownloadStatus('JPG siap. Periksa folder unduhan Anda.')
     } catch (error: unknown) {
-      setDownloadError(errorMessage(error, 'PNG gagal dibuat. Coba unduh kembali.'))
+      setDownloadError(errorMessage(error, 'JPG gagal dibuat. Coba unduh kembali.'))
     } finally {
       exportLockRef.current = false
       setExporting(false)
@@ -259,7 +259,7 @@ export default function App() {
   const statusLabel = templateError || renderError ? 'Perlu diperiksa'
     : !templateMatchesKind ? 'Memuat template'
       : uploading ? 'Memuat foto'
-        : exporting ? 'Menyiapkan PNG'
+        : exporting ? 'Menyiapkan JPG'
           : ready ? 'Siap diunduh' : 'Sedang disusun'
 
   return (
@@ -388,11 +388,11 @@ export default function App() {
           </div>
           <div className="export-spec">
             <span className="export-size">{CARD_SIZE_CM.width.toLocaleString('id-ID')} × {CARD_SIZE_CM.height.toLocaleString('id-ID')} cm</span>
-            <span>{CARD_WIDTH} × {CARD_HEIGHT} px · PNG · {PRINT_DPI} DPI</span>
+            <span>{CARD_WIDTH} × {CARD_HEIGHT} px · JPG · {PRINT_DPI} DPI</span>
           </div>
           <button form="card-form" type="submit" className="download-button" disabled={!ready} aria-describedby="download-hint">
             <span className={`download-symbol${exporting ? ' is-processing' : ''}`} aria-hidden="true" />
-            {exporting ? 'Menyiapkan PNG…' : 'Unduh PNG'}
+            {exporting ? 'Menyiapkan JPG…' : 'Unduh JPG'}
           </button>
           <p id="download-hint" className="download-hint">{ready ? photo ? 'Kartu Anda siap. Simpan dan gunakan.' : 'Kartu siap diunduh tanpa foto.' : `Lengkapi nama dan ${variant.detailLabel.toLowerCase()} untuk mengunduh. Foto opsional.`}</p>
           {(templateError || renderError || downloadError) && <p className="preview-error" role="alert">{templateError || renderError || downloadError}</p>}

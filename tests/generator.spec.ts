@@ -3,27 +3,36 @@ import type { Page } from '@playwright/test';
 import { readFile } from 'node:fs/promises';
 
 function checkPrintResolution(bytes: Buffer) {
-  const width = bytes.readUInt32BE(16);
-  const height = bytes.readUInt32BE(20);
-  expect(width).toBe(650);
-  expect(height).toBe(1004);
-  const physical: Buffer[] = [];
-  for (let offset = 8; offset + 12 <= bytes.length;) {
-    const length = bytes.readUInt32BE(offset);
-    if (bytes.toString('ascii', offset + 4, offset + 8) === 'pHYs') physical.push(bytes.subarray(offset, offset + length + 12));
-    offset += length + 12;
+  expect(bytes.readUInt16BE(0)).toBe(0xffd8);
+  expect(bytes.readUInt16BE(bytes.length - 2)).toBe(0xffd9);
+  const frames: { width: number; height: number }[] = [];
+  const densities: { units: number; x: number; y: number }[] = [];
+  const frameMarkers = new Set([0xc0, 0xc1, 0xc2, 0xc3, 0xc5, 0xc6, 0xc7, 0xc9, 0xca, 0xcb, 0xcd, 0xce, 0xcf]);
+  for (let offset = 2; offset < bytes.length;) {
+    expect(bytes[offset]).toBe(0xff);
+    while (bytes[offset] === 0xff) offset++;
+    const marker = bytes[offset++];
+    if (marker === 0xda || marker === 0xd9) break;
+    if (marker === 0x01 || (marker >= 0xd0 && marker <= 0xd7)) continue;
+    const length = bytes.readUInt16BE(offset);
+    expect(length).toBeGreaterThanOrEqual(2);
+    expect(offset + length).toBeLessThanOrEqual(bytes.length);
+    const payload = bytes.subarray(offset + 2, offset + length);
+    if (frameMarkers.has(marker)) {
+      expect(payload.length).toBeGreaterThanOrEqual(6);
+      frames.push({ height: payload.readUInt16BE(1), width: payload.readUInt16BE(3) });
+    }
+    if (marker === 0xe0 && payload.subarray(0, 5).equals(Buffer.from('JFIF\0', 'ascii'))) {
+      expect(payload.length).toBeGreaterThanOrEqual(14);
+      densities.push({ units: payload[7], x: payload.readUInt16BE(8), y: payload.readUInt16BE(10) });
+    }
+    offset += length;
   }
-  expect(physical).toHaveLength(1);
-  expect(physical[0].readUInt32BE(0)).toBe(9);
-  expect(physical[0].readUInt32BE(8)).toBe(11811);
-  expect(physical[0].readUInt32BE(12)).toBe(11811);
-  expect(physical[0][16]).toBe(1);
-  // Independently verified CRC for the standard 300 DPI pHYs payload.
-  expect(physical[0].readUInt32BE(17)).toBe(0x78a53f76);
+  expect(frames).toEqual([{ width: 650, height: 1004 }]);
+  expect(densities).toEqual([{ units: 1, x: 300, y: 300 }]);
   // Pixel dimensions are rounded to whole pixels at 300 DPI.
-  const pixelsPerCentimeter = physical[0].readUInt32BE(8) / 100;
-  expect(Math.abs(width / pixelsPerCentimeter - 5.5)).toBeLessThan(0.01);
-  expect(Math.abs(height / pixelsPerCentimeter - 8.5)).toBeLessThan(0.01);
+  expect(Math.abs(frames[0].width / (densities[0].x / 2.54) - 5.5)).toBeLessThan(0.01);
+  expect(Math.abs(frames[0].height / (densities[0].y / 2.54) - 8.5)).toBeLessThan(0.01);
 }
 
 async function fingerprint(page: Page) {
@@ -56,7 +65,7 @@ async function uploadFixture(page: Page) {
   await expect(page.getByRole('button', { name: 'Hapus foto' })).toBeVisible();
 }
 
-test('PNG matches preview, cropping changes result, and reset clears data without uploads', async ({ page }, testInfo) => {
+test('JPG matches JPEG-encoded preview, cropping changes result, and reset clears data without uploads', async ({ page }, testInfo) => {
   const errors: string[] = [];
   const uploads: string[] = [];
   page.on('pageerror', (error) => errors.push(error.message));
@@ -64,7 +73,7 @@ test('PNG matches preview, cropping changes result, and reset clears data withou
     if (request.method() !== 'GET') uploads.push(`${request.method()} ${request.url()}`);
   });
   await page.goto('/');
-  const downloadButton = page.getByRole('button', { name: 'Unduh PNG', exact: true });
+  const downloadButton = page.getByRole('button', { name: 'Unduh JPG', exact: true });
   await expect(downloadButton).toBeDisabled();
   await expect(page.getByText('Memuat template', { exact: true })).toHaveCount(0);
   await page.screenshot({ path: testInfo.outputPath('initial.png'), fullPage: true });
@@ -83,10 +92,11 @@ test('PNG matches preview, cropping changes result, and reset clears data withou
   await expect.poll(() => fingerprint(page)).not.toBe(afterZoom);
   await page.keyboard.up('ArrowRight');
   await expect(downloadButton).toBeEnabled();
-  const preview = await page.locator('canvas').evaluate((canvas: HTMLCanvasElement) => canvas.toDataURL());
+  // Compare identical JPEG encoding because compression changes raw preview pixels.
+  const preview = await page.locator('canvas').evaluate((canvas: HTMLCanvasElement) => canvas.toDataURL('image/jpeg', 0.95));
   const [download] = await Promise.all([page.waitForEvent('download'), downloadButton.click()]);
-  expect(download.suggestedFilename()).toBe('id-card-panitia-siti-nur-aisyah.png');
-  const saved = testInfo.outputPath('id-card.png');
+  expect(download.suggestedFilename()).toBe('id-card-panitia-siti-nur-aisyah.jpg');
+  const saved = testInfo.outputPath('id-card.jpg');
   await download.saveAs(saved);
   const bytes = await readFile(saved);
   checkPrintResolution(bytes);
@@ -103,7 +113,7 @@ test('PNG matches preview, cropping changes result, and reset clears data withou
       return { width: canvas.width, height: canvas.height, data: context.getImageData(0, 0, canvas.width, canvas.height).data };
     }
     const [first, second] = await Promise.all([pixels(preview), pixels(output)]);
-    if (first.width !== second.width || first.height !== second.height) throw new Error('Preview and PNG dimensions differ');
+    if (first.width !== second.width || first.height !== second.height) throw new Error('Preview and JPG dimensions differ');
     let different = 0;
     let maxDelta = 0;
     let minX = first.width, minY = first.height, maxX = 0, maxY = 0;
@@ -118,7 +128,7 @@ test('PNG matches preview, cropping changes result, and reset clears data withou
       }
     }
     return { different, maxDelta, bounds: { minX, minY, maxX, maxY } };
-  }, { preview, output: `data:image/png;base64,${bytes.toString('base64')}` });
+  }, { preview, output: `data:image/jpeg;base64,${bytes.toString('base64')}` });
   expect(pixelComparison).toEqual({ different: 0, maxDelta: 0, bounds: { minX: 650, minY: 1004, maxX: 0, maxY: 0 } });
   await page.screenshot({ path: testInfo.outputPath('completed.png'), fullPage: true });
   await page.getByRole('button', { name: 'Reset', exact: true }).click();
@@ -153,12 +163,12 @@ test('photo is optional, labels are uppercase, and portrait card contains a 4 by
   await page.goto('/');
   await page.getByLabel('Nama lengkap').fill('Siti Nur Aisyah');
   await page.getByRole('textbox', { name: 'Jabatan', exact: true }).fill('Koordinator Acara');
-  const button = page.getByRole('button', { name: 'Unduh PNG', exact: true });
+  const button = page.getByRole('button', { name: 'Unduh JPG', exact: true });
   await expect(button).toBeEnabled();
   await expect(page.getByText('Kartu siap diunduh tanpa foto.', { exact: true })).toBeVisible();
   await page.evaluate(() => { (window as Window & { __cardText: string[] }).__cardText = []; });
   const [download] = await Promise.all([page.waitForEvent('download'), button.click()]);
-  const saved = testInfo.outputPath('without-photo.png');
+  const saved = testInfo.outputPath('without-photo.jpg');
   await download.saveAs(saved);
   const bytes = await readFile(saved);
   checkPrintResolution(bytes);
@@ -174,8 +184,8 @@ test('photo is optional, labels are uppercase, and portrait card contains a 4 by
   await uploadFixture(page);
   await expect(button).toBeEnabled();
   const size = await page.evaluate(() => (window as Window & { __photoSizes: number[][] }).__photoSizes.at(-1)!);
-  expect(size[0] / (11811 / 100)).toBeCloseTo(4, 3);
-  expect(size[1] / (11811 / 100)).toBeCloseTo(6, 3);
+  expect(size[0] / (300 / 2.54)).toBeCloseTo(4, 3);
+  expect(size[1] / (300 / 2.54)).toBeCloseTo(6, 3);
   expect(size[0] / size[1]).toBeCloseTo(2 / 3, 8);
   expect(size[2]).toBeGreaterThanOrEqual(0);
   expect(size[3]).toBeGreaterThanOrEqual(0);
@@ -192,7 +202,7 @@ test('long text and invalid photos cannot produce a broken card', async ({ page 
   await uploadFixture(page);
   await expect(page.getByLabel('Nama lengkap')).toHaveAttribute('aria-invalid', 'true');
   await expect(page.getByRole('textbox', { name: 'Jabatan', exact: true })).toHaveAttribute('aria-invalid', 'true');
-  const button = page.getByRole('button', { name: 'Unduh PNG', exact: true });
+  const button = page.getByRole('button', { name: 'Unduh JPG', exact: true });
   await expect(button).toBeDisabled();
   await page.getByLabel('Nama lengkap').fill('Ahmad Fauzi');
   await page.getByRole('textbox', { name: 'Jabatan', exact: true }).fill('Panitia');
@@ -228,7 +238,7 @@ test('participant tab uses Pangkalan and correct template during fast switches',
   await page.goto('/');
   const panitia = page.getByRole('tab', { name: 'Panitia', exact: true });
   const peserta = page.getByRole('tab', { name: 'Peserta', exact: true });
-  const button = page.getByRole('button', { name: 'Unduh PNG', exact: true });
+  const button = page.getByRole('button', { name: 'Unduh JPG', exact: true });
   await expect(panitia).toHaveAttribute('aria-selected', 'true');
   await page.getByLabel('Nama lengkap').fill('Ayu Putri');
   await page.getByRole('textbox', { name: 'Jabatan', exact: true }).fill('Koordinator');
@@ -254,8 +264,8 @@ test('participant tab uses Pangkalan and correct template during fast switches',
   await expect(button).toBeEnabled();
   await page.evaluate(() => { (window as Window & { __cardText: string[] }).__cardText = []; });
   const [download] = await Promise.all([page.waitForEvent('download'), button.click()]);
-  expect(download.suggestedFilename()).toBe('id-card-peserta-ayu-putri.png');
-  const saved = testInfo.outputPath('participant.png');
+  expect(download.suggestedFilename()).toBe('id-card-peserta-ayu-putri.jpg');
+  const saved = testInfo.outputPath('participant.jpg');
   await download.saveAs(saved);
   const bytes = await readFile(saved);
   checkPrintResolution(bytes);

@@ -1,12 +1,12 @@
 **Verifikasi implementasi — 13 Oktober 2026**
 
-Seluruh kartu Panitia dan Peserta berbentuk portrait dengan lebar 5,5 cm × tinggi 8,5 cm. Area foto 4 × 6 cm dipertahankan, dengan dua label ringkas di bawahnya. Build produksi berhasil dan seluruh delapan tes browser versi final ini lulus pada 13 Oktober 2026. Pemeriksaan visual PNG dan screenshot memastikan susunan foto, logo, serta label berada di dalam kartu.
+Seluruh kartu Panitia dan Peserta berbentuk portrait dengan lebar 5,5 cm × tinggi 8,5 cm. Area foto 4 × 6 cm dipertahankan, dengan dua label ringkas di bawahnya. Unduhan memakai JPG saja. Build produksi dan seluruh delapan tes browser versi JPG lulus pada 13 Oktober 2026; hasil file JPG juga diperiksa secara visual.
 
-Cakupan pengujian yang lulus untuk ukuran terbaru:
+Cakupan pengujian yang lulus untuk ekspor JPG:
 
 - Empat skenario pada Chrome desktop dan empat pada Chrome dengan viewport ponsel Pixel 7.
-- Dimensi PNG 650 × 1004 px, diperiksa langsung dari header file.
-- Satu pHYs chunk 300 DPI yang valid, termasuk CRC. Lebar dan tinggi fisik dihitung dari dimensi PNG dan pHYs, dengan toleransi kurang dari 0,01 cm terhadap 5,5 × 8,5 cm.
+- Signature JPEG SOI/EOI dan dimensi JPG 650 × 1004 px, diperiksa langsung dari header SOF file.
+- Satu segmen JFIF APP0 dengan unit inci dan densitas horizontal/vertikal 300 DPI. Lebar dan tinggi fisik dihitung dari dimensi JPG dan densitas tersebut, dengan toleransi kurang dari 0,01 cm terhadap 5,5 × 8,5 cm.
 - Area foto tetap 4 × 6 cm dengan rasio 2:3 sesuai permintaan pengguna sebelumnya, berada sepenuhnya di dalam kartu portrait.
 - Unduhan tanpa foto dan tanpa placeholder foto pada hasil.
 - Nama dan Jabatan/Pangkalan mixed case dirender UPPERCASE pada Canvas hasil ekspor.
@@ -15,11 +15,12 @@ Cakupan pengujian yang lulus untuk ukuran terbaru:
 - Navigasi tab dengan keyboard; Jabatan dan Pangkalan tetap terpisah saat tab diganti.
 - Nama/foto dipertahankan saat tab diganti; Reset membersihkan data sambil mempertahankan pilihan tab.
 - Label Nama Peserta memakai #B91C1C dan Pangkalan memakai #991B1B, dengan teks putih.
-- Pixel PNG yang diunduh sama dengan pixel preview.
+- Pixel JPG yang diunduh sama dengan hasil preview yang dienkode JPEG pada kualitas 95%, setelah kedua gambar didekode. Preview mentah dan JPG tidak dituntut identik karena JPEG memakai kompresi lossy.
 - Zoom dan posisi crop dengan keyboard mengubah preview sebelum tombol panah dilepas.
 - Nama/Jabatan/Pangkalan yang tidak muat serta input kosong menonaktifkan unduhan.
 - File PNG tidak valid dan foto di atas 10 MB ditolak dengan pesan yang jelas.
 - Tidak ada request upload/POST pada skenario membuat dan mengunduh kartu.
+- Pemeriksaan tambahan berhasil untuk pembaruan metadata JFIF yang sudah ada serta penyisipan JFIF jika tidak tersedia; byte kompresi gambar dipertahankan tanpa encoding ulang.
 - Lebar halaman tidak melebihi viewport pada desktop dan ponsel yang diuji.
 - Screenshot awal dan setelah unduh tersedia untuk pemeriksaan visual susunan portrait.
 

@@ -1,6 +1,7 @@
-import { withPrintResolution } from './png';
+import { withPrintResolution } from './jpeg';
 
 export const PRINT_DPI = 300;
+export const JPEG_QUALITY = 0.95;
 export const CARD_SIZE_CM = { width: 5.5, height: 8.5 } as const;
 export const CARD_WIDTH = Math.round(CARD_SIZE_CM.width * PRINT_DPI / 2.54);
 export const CARD_HEIGHT = Math.round(CARD_SIZE_CM.height * PRINT_DPI / 2.54);
@@ -152,6 +153,8 @@ export function renderCard(
   if (!context) throw new Error('Browser ini belum mendukung pembuatan kartu.');
   context.imageSmoothingEnabled = true;
   context.imageSmoothingQuality = 'high';
+  context.fillStyle = '#ffffff';
+  context.fillRect(0, 0, CARD_WIDTH, CARD_HEIGHT);
   drawPortraitBackground(context, template);
 
   if (data.photo && data.crop && data.crop.width > 0 && data.crop.height > 0) {
@@ -190,7 +193,7 @@ export function renderCard(
   };
 }
 
-export async function exportPng(template: HTMLImageElement, data: CardData): Promise<Blob> {
+export async function exportJpg(template: HTMLImageElement, data: CardData): Promise<Blob> {
   if (!data.name.trim() || !cardDetail(data).trim() || (data.photo && !data.crop)) {
     throw new Error(`Lengkapi nama dan ${CARD_VARIANTS[data.kind].detailLabel.toLowerCase()} sebelum mengunduh. Tunggu foto selesai diproses jika Anda menambahkannya.`);
   }
@@ -202,9 +205,9 @@ export async function exportPng(template: HTMLImageElement, data: CardData): Pro
   }
   const imageBlob = await new Promise<Blob>((resolve, reject) => {
     canvas.toBlob((blob) => {
-      if (blob) resolve(blob);
-      else reject(new Error('PNG gagal dibuat. Coba unduh sekali lagi.'));
-    }, 'image/png');
+      if (blob?.type === 'image/jpeg') resolve(blob);
+      else reject(new Error('JPG gagal dibuat. Coba unduh sekali lagi atau gunakan browser terbaru.'));
+    }, 'image/jpeg', JPEG_QUALITY);
   });
   return withPrintResolution(imageBlob, PRINT_DPI);
 }
@@ -212,7 +215,7 @@ export async function exportPng(template: HTMLImageElement, data: CardData): Pro
 export function makeFilename(name: string, kind: CardKind = 'panitia'): string {
   const safe = name.normalize('NFKD').replace(/[\u0300-\u036f]/g, '')
     .toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 80);
-  return `id-card-${kind}-${safe || 'kartu'}.png`;
+  return `id-card-${kind}-${safe || 'kartu'}.jpg`;
 }
 
 export function downloadBlob(blob: Blob, filename: string): void {
